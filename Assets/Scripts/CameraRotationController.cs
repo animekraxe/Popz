@@ -29,6 +29,7 @@ public class CameraRotationController : MonoBehaviour {
 
 	private GameObject player;
 	private Vector3 newPlayerPos;
+	public int platformID;
 
 	// Use this for initialization
 	void Start () {
@@ -83,6 +84,7 @@ public class CameraRotationController : MonoBehaviour {
 		int i = 0;
 		foreach(GameObject platform in platforms) {
 			platformPos[i] = platform.transform.position;
+			platform.GetComponent<PlatformID>().ID = i;
 			++i;
 		}
 	}
@@ -303,8 +305,11 @@ public class CameraRotationController : MonoBehaviour {
 
 	void setPlatformsIn2D() {
 		float newZ = 0.0f;
+		Vector3 newPos = player.transform.position;
+		newPos.z = newZ;
+		player.transform.position = newPos;
 		foreach(GameObject platform in platforms) {
-			Vector3 newPos = platform.transform.position;
+			newPos = platform.transform.position;
 			newPos.z = newZ;
 			platform.transform.position = newPos;
 		}
@@ -313,7 +318,12 @@ public class CameraRotationController : MonoBehaviour {
 	void pausePlayer() {
 		player.rigidbody.constraints = RigidbodyConstraints.None;
 		player.rigidbody.isKinematic = true;
-		player.transform.parent = this.transform;
+
+		// Rotate with camera (works all the time, but does not achieve the desired mechanic we're going for)
+		//player.transform.parent = this.transform;
+
+		// Stay with the last platform landed on (the desired mechanic but has some issues when playing free-range mode)
+		player.transform.parent = platforms[platformID].transform;
 	}
 
 	void resumePlayer() {

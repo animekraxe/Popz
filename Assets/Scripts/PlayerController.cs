@@ -110,4 +110,11 @@ public class PlayerController : MonoBehaviour {
 			break;
 		}
 	}
+
+	void OnCollisionEnter(Collision col) {
+		if( col.gameObject.tag == "Platform" ) {
+			camRotCtrl.platformID = col.gameObject.GetComponent<PlatformID>().ID;
+		}
+	}
+
 }
