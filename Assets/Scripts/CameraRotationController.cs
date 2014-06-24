@@ -3,9 +3,11 @@ using System.Collections;
 
 public class CameraRotationController : MonoBehaviour {
 
+	// time durations for rotation and translation animations
 	private float camRotationDuration = 1.0f;
 	private float platformTransformDuration = 0.5f;
 
+	// enum sets to handle input control and state machines
 	private enum ROTATION { NONE = 0, RIGHT = 1, LEFT = 2 };
 	private enum ROTATION_STATE { TRANSFORM = 0, ROTATE = 1, PROJECT = 2, DONE = 3 };
 	private enum SUB_STATE { SETUP = 0, PERFORM = 1, COMPLETE = 2 };
@@ -13,57 +15,53 @@ public class CameraRotationController : MonoBehaviour {
 	private ROTATION_STATE rState;
 	private SUB_STATE subState;
 
-	private bool doneRotation;
-
+	// keeps track of current view
 	public enum VIEW { FRONT = 0, RIGHT = 1, BACK = 2, LEFT = 3 };
 	public VIEW view;
 
+	// used to keep track of elapsed time for animations
 	private float t;
+
+	// specifies the current rotation of camera and the rotation to animate it to
+	//		(it's really the rotation angle of the SpinController, which moves the camera)
 	public float oldRotation;
 	public float newRotation;
 
+	// keep track of platform game objects, their real position, and positions for animating them from 2D to 3D and vice versa
 	private GameObject[] platforms;
 	private Vector3[] platformPos;
 	private Vector3[] oldPlatformPos;
 	private Vector3[] newPlatformPos;
 
+	// keep track of player game object, and new position to move player to after a rotation
+	//		(the player's position should already be correct when it is moved by its parent platform, but it doesn't hurt to be careful)
 	private GameObject player;
 	private Vector3 newPlayerPos;
-	public int platformID;
 
-	// Use this for initialization
+	// id of the last platform the player has jumped onto
+	public int platformID;
+	
 	void Start () {
 		initGameObjects();
 		initVars();
 		projectPlatformsOnto2D();
 		setPlatformsIn2D();
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
-		if( Input.GetKeyDown("right") && doneRotation ) {
-			doneRotation = false;
+		if( Input.GetKeyDown("right") && rotating == ROTATION.NONE ) {
 			rotating = ROTATION.RIGHT;
 			rState = ROTATION_STATE.TRANSFORM;
 			subState = SUB_STATE.SETUP;
 		}
-		else if( Input.GetKeyDown("left") && doneRotation ) {
-			doneRotation = false;
+		else if( Input.GetKeyDown("left") && rotating == ROTATION.NONE ) {
 			rotating = ROTATION.LEFT;
 			rState = ROTATION_STATE.TRANSFORM;
 			subState = SUB_STATE.SETUP;
 		}
 
-		if(!doneRotation) {
-			if( rotating == ROTATION.NONE ) {
-				doneRotation = true;
-			}
-			else {
-				rotationController();
-			}
-		}
-		else {
-			rotating = ROTATION.NONE;
+		if( rotating != ROTATION.NONE ) {
+			rotationController();
 		}
 		
 	}
@@ -89,6 +87,16 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
+	// State machine to handle rotation sequence
+	//     This sequence has 4 steps:
+	//         Transform: pauses the player and moves the platforms back to their real position in 3D
+	//         Rotate: rotates the camera to the next view
+	//         Project: moves the platforms back to a 2D position relative to the new view
+	//         Done: resumes the player and resets the rotating variable
+	//     Each step has 3 parts (excluding Done):
+	//         Setup: initialize variables, calculate new positions/rotation, etc.
+	//         Perform: perform the actual animation (translation, rotation, etc)
+	//         Complete: finish up step, set enum value to next step, etc.
 	void rotationController() {
 		switch(rState) {
 			case ROTATION_STATE.TRANSFORM:
@@ -149,11 +157,14 @@ public class CameraRotationController : MonoBehaviour {
 				break;
 			case ROTATION_STATE.DONE:
 				resumePlayer();
-				doneRotation = true;
+				rotating = ROTATION.NONE;
 				break;
 		}
 	}
 
+	// method that sets up values for moving platforms from their real 3D position to an appropriate 2D projection
+	//     for front and back view, projects platforms to z = 0
+	//     for side views, projects platforms to x = 0
 	void projectPlatformsOnto2D() {
 		float newX, newZ;
 		int i;
@@ -183,6 +194,7 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
+	// method that sets up values for moving platforms from their current 2D projected position back to their real 3D position
 	void transformPlatformsBackTo3D() {
 		int i = 0;
 		foreach( Vector3 pos in platformPos) {
@@ -192,6 +204,8 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
+	// linearly interpolate between the old position and new position
+	//   lasts for 'platformTransformDuration' seconds before reaching it's destination
 	bool interpolatePlatforms() {
 		t += Time.deltaTime / platformTransformDuration;
 		int i = 0;
@@ -212,6 +226,7 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
+	// similar to interpolate platforms, but with extra cases because of wrap around (360 degrees = 0 degrees)
 	bool interpolateCamera() {
 		t += Time.deltaTime / camRotationDuration;
 		if( t >= 1.0f ) {
@@ -245,6 +260,7 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
+	// sets the new rotation angle to be used when interpolating the cameras rotation
 	void setNewRotation() {
 		switch(view) {
 			case VIEW.FRONT:
@@ -274,6 +290,7 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
+	// sets view to the correct view after performing a rotation
 	void setNewView() {
 		switch(view) {
 			case VIEW.FRONT:
@@ -303,6 +320,7 @@ public class CameraRotationController : MonoBehaviour {
 			}
 	}
 
+	// function used in Start() to initially project the player and platforms to z = 0
 	void setPlatformsIn2D() {
 		float newZ = 0.0f;
 		Vector3 newPos = player.transform.position;
@@ -315,6 +333,7 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
+	// this is sort of the equivalent of setting the rigidbody to inactive, stopping the character from moving
 	void pausePlayer() {
 		player.rigidbody.constraints = RigidbodyConstraints.None;
 		player.rigidbody.isKinematic = true;
@@ -326,6 +345,7 @@ public class CameraRotationController : MonoBehaviour {
 		player.transform.parent = platforms[platformID].transform;
 	}
 
+	// make sure that character is correctly projected onto the appropriate 2D grid and 'reactivate' the rigidbody
 	void resumePlayer() {
 		newPlayerPos = player.transform.position;
 		if( view == VIEW.LEFT || view == VIEW.RIGHT ) {
