@@ -43,8 +43,8 @@ public class RedirectModifier : MonoBehaviour {
 			}
 			else {
 				modCube.transform.Rotate(new Vector3(-120.0f * Time.deltaTime, -120.0f * Time.deltaTime, -120.0f * Time.deltaTime));
-				ps.emissionRate = initER*2;
-				ps.startSpeed = initSS*2;
+				ps.emissionRate = initER*3;
+				ps.startSpeed = initSS*3;
 			}
 		}
 
