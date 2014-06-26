@@ -10,15 +10,25 @@ public class PlayerController : MonoBehaviour {
 
 	private CameraRotationController camRotCtrl;	// variable to interface with CameraRotationController script
 
+	public bool freeRoamMode = false;
+
 	void Start () {
 	
 		// init variables
 		GameObject spinCtrl = GameObject.FindGameObjectWithTag("SpinController");
 		camRotCtrl = spinCtrl.GetComponent<CameraRotationController>();
-		isMovingRight = false;
-		isMovingLeft = false;
-		isJumping = false;
-		
+
+		if( freeRoamMode ) {
+			isMovingRight = false;
+			isMovingLeft = false;
+			isJumping = false;
+		}
+		else {
+			isMovingRight = true;
+			isMovingLeft = false;
+			isJumping = false;
+		}
+
 		// restrict the character from moving in the z-direction
 		rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
 	}
@@ -27,18 +37,20 @@ public class PlayerController : MonoBehaviour {
 	
 		//===== Input Interface =====//
 	
-		if( Input.GetKey(KeyCode.D) ) {
-			isMovingRight = true;
-		}
-		else {
-			isMovingRight = false;
-		}
+		if( freeRoamMode ) {
+			if( Input.GetKey(KeyCode.D) ) {
+				isMovingRight = true;
+			}
+			else {
+				isMovingRight = false;
+			}
 
-		if( Input.GetKey(KeyCode.A) ) {
-			isMovingLeft = true;
-		}
-		else {
-			isMovingLeft = false;
+			if( Input.GetKey(KeyCode.A) ) {
+				isMovingLeft = true;
+			}
+			else {
+				isMovingLeft = false;
+			}
 		}
 
 		if( Input.GetKeyDown(KeyCode.Space) ) {
@@ -47,6 +59,9 @@ public class PlayerController : MonoBehaviour {
 		else {
 			isJumping = false;
 		}
+
+		// update platform ID
+		setPlatformID();
 	}
 
 	void FixedUpdate() {
@@ -118,9 +133,10 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	void OnCollisionEnter(Collision col) {	// when colliding with a platform, set the platformID to that platform's ID
-		if( col.gameObject.tag == "Platform" ) {
-			camRotCtrl.platformID = col.gameObject.GetComponent<PlatformID>().ID;
+	void setPlatformID() {
+		RaycastHit hit;
+		if( Physics.Raycast(this.transform.position, -Vector3.up, out hit) ) {
+			camRotCtrl.platformID = hit.transform.gameObject.GetComponent<PlatformID>().ID;
 		}
 	}
 

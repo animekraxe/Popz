@@ -36,6 +36,7 @@ public class CameraRotationController : MonoBehaviour {
 	// keep track of player game object, and new position to move player to after a rotation
 	//		(the player's position should already be correct when it is moved by its parent platform, but it doesn't hurt to be careful)
 	private GameObject player;
+	private PlayerController plyrCtrl;
 	private Vector3 newPlayerPos;
 
 	// id of the last platform the player has jumped onto
@@ -49,15 +50,13 @@ public class CameraRotationController : MonoBehaviour {
 	}
 
 	void Update () {
-		if( Input.GetKeyDown("right") && rotating == ROTATION.NONE ) {
-			rotating = ROTATION.RIGHT;
-			rState = ROTATION_STATE.TRANSFORM;
-			subState = SUB_STATE.SETUP;
-		}
-		else if( Input.GetKeyDown("left") && rotating == ROTATION.NONE ) {
-			rotating = ROTATION.LEFT;
-			rState = ROTATION_STATE.TRANSFORM;
-			subState = SUB_STATE.SETUP;
+		if( plyrCtrl.freeRoamMode ) {
+			if( Input.GetKeyDown("right") && rotating == ROTATION.NONE ) {
+				performRotateRight();
+			}
+			else if( Input.GetKeyDown("left") && rotating == ROTATION.NONE ) {
+				performRotateLeft();
+			}
 		}
 
 		if( rotating != ROTATION.NONE ) {
@@ -66,9 +65,22 @@ public class CameraRotationController : MonoBehaviour {
 		
 	}
 
+	public void performRotateRight() {
+		rotating = ROTATION.RIGHT;
+		rState = ROTATION_STATE.TRANSFORM;
+		subState = SUB_STATE.SETUP;
+	}
+	
+	public void performRotateLeft() {
+		rotating = ROTATION.LEFT;
+		rState = ROTATION_STATE.TRANSFORM;
+		subState = SUB_STATE.SETUP;
+	}
+	
 	void initGameObjects() {
 		player = GameObject.FindGameObjectWithTag("Player");
-		
+		plyrCtrl = player.GetComponent<PlayerController>();
+
 		platforms = GameObject.FindGameObjectsWithTag("Platform");
 	}
 
@@ -342,7 +354,17 @@ public class CameraRotationController : MonoBehaviour {
 		//player.transform.parent = this.transform;
 
 		// Stay with the last platform landed on (the desired mechanic but has some issues when playing free-range mode)
-		player.transform.parent = platforms[platformID].transform;
+		//player.transform.parent = platforms[platformID].transform;
+
+		// fix warping glitch
+		newPlayerPos = player.transform.position;
+		if( view == VIEW.FRONT || view == VIEW.BACK ) {
+			newPlayerPos.z = platformPos[platformID].z;
+		}
+		else {
+			newPlayerPos.x = platformPos[platformID].x;
+		}
+		player.transform.position = newPlayerPos;
 	}
 
 	// make sure that character is correctly projected onto the appropriate 2D grid and 'reactivate' the rigidbody
