@@ -136,7 +136,10 @@ public class PlayerController : MonoBehaviour {
 	void setPlatformID() {
 		RaycastHit hit;
 		if( Physics.Raycast(this.transform.position, -Vector3.up, out hit) ) {
-			camRotCtrl.platformID = hit.transform.gameObject.GetComponent<PlatformID>().ID;
+			PlatformID p = hit.transform.gameObject.GetComponent<PlatformID>();
+			if (p != null) { 
+				camRotCtrl.platformID = p.ID;
+			}
 		}
 	}
 
