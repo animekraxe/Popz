@@ -5,7 +5,9 @@ public class BoostModifier : MonoBehaviour {
 
 	private GameObject plyr;
 
-	private float boostVel = 7.0f;
+	private CameraRotationController camRotCtrl;
+
+	private float boostVel = 10.0f;
 	
 	private ParticleSystem ps;
 	private float initER, initSS;
@@ -21,7 +23,9 @@ public class BoostModifier : MonoBehaviour {
 	
 	void Start () {
 		plyr= GameObject.FindGameObjectWithTag("Player");
-		
+
+		camRotCtrl = GameObject.FindGameObjectWithTag("SpinController").GetComponent<CameraRotationController>();
+
 		ps = this.gameObject.particleSystem;
 		
 		modCube = this.transform.parent.FindChild("ModifierCube");
@@ -69,8 +73,19 @@ public class BoostModifier : MonoBehaviour {
 			initER = ps.emissionRate;
 			initSS = ps.startSpeed;
 			collided = true;
-			
-			plyr.rigidbody.velocity += new Vector3(boostVel, 0, 0);
+
+			plyr.GetComponent<PlayerController>().boostMod = true;
+
+			switch(camRotCtrl.view) {
+				case CameraRotationController.VIEW.FRONT:
+				case CameraRotationController.VIEW.BACK:
+					plyr.rigidbody.velocity = new Vector3(boostVel, 0, 0);
+					break;
+				case CameraRotationController.VIEW.RIGHT:
+				case CameraRotationController.VIEW.LEFT:
+					plyr.rigidbody.velocity = new Vector3(0, 0, -boostVel);
+					break;
+			}
 		}
 	}
 }

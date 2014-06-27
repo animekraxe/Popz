@@ -8,6 +8,10 @@ public class PlayerController : MonoBehaviour {
 	private float jumpVel = 5.0f;	// amount of velocity to apply to make the character jump
 	public bool isMovingRight, isMovingLeft, isJumping;	// flags to interface w/ input controls
 
+	public bool boostMod;
+	private float boostAnimTimer;
+	private float boostAnimDuration = 0.5f;
+
 	private CameraRotationController camRotCtrl;	// variable to interface with CameraRotationController script
 
 	public bool freeRoamMode = false;
@@ -28,6 +32,9 @@ public class PlayerController : MonoBehaviour {
 			isMovingLeft = false;
 			isJumping = false;
 		}
+
+		boostMod = false;
+		boostAnimTimer = 0.0f;
 
 		// restrict the character from moving in the z-direction
 		rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
@@ -70,16 +77,27 @@ public class PlayerController : MonoBehaviour {
 		if( rigidbody.isKinematic ) return;
 
 		// otherwise, perform movements if input was given
-		if( isMovingRight ) {
-			moveRight();
+		if( boostMod ) {
+			if( boostAnimTimer >= boostAnimDuration ) {
+				boostMod = false;
+				boostAnimTimer = 0.0f;
+			}
+			else {
+				boostAnimTimer += Time.deltaTime;
+			}
 		}
+		else {
+			if( isMovingRight ) {
+				moveRight();
+			}
 
-		if( isMovingLeft ) {
-			moveLeft();
-		}
+			if( isMovingLeft ) {
+				moveLeft();
+			}
 
-		if( isJumping ) {
-			rigidbody.velocity += new Vector3(0, jumpVel, 0);
+			if( isJumping ) {
+				rigidbody.velocity += new Vector3(0, jumpVel, 0);
+			}
 		}
 	}
 
@@ -136,7 +154,9 @@ public class PlayerController : MonoBehaviour {
 	void setPlatformID() {
 		RaycastHit hit;
 		if( Physics.Raycast(this.transform.position, -Vector3.up, out hit) ) {
-			camRotCtrl.platformID = hit.transform.gameObject.GetComponent<PlatformID>().ID;
+			if( hit.transform.gameObject.tag == "Platform" ) {
+				camRotCtrl.platformID = hit.transform.gameObject.GetComponent<PlatformID>().ID;
+			}
 		}
 	}
 

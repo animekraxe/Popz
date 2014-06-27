@@ -4,8 +4,8 @@ using System.Collections;
 public class CameraRotationController : MonoBehaviour {
 
 	// time durations for rotation and translation animations
-	private float camRotationDuration = 1.0f;
-	private float platformTransformDuration = 0.5f;
+	private float rotationDuration = 1.0f;
+	private float translateDuration = 0.5f;
 
 	// enum sets to handle input control and state machines
 	private enum ROTATION { NONE = 0, RIGHT = 1, LEFT = 2 };
@@ -33,6 +33,12 @@ public class CameraRotationController : MonoBehaviour {
 	private Vector3[] oldPlatformPos;
 	private Vector3[] newPlatformPos;
 
+	// keep track of modifier game objects, their real position, and positions for animating them from 2D to 3D and vice versa
+	private GameObject[] mods;
+	private Vector3[] modPos;
+	private Vector3[] oldModPos;
+	private Vector3[] newModPos;
+
 	// keep track of player game object, and new position to move player to after a rotation
 	//		(the player's position should already be correct when it is moved by its parent platform, but it doesn't hurt to be careful)
 	private GameObject player;
@@ -45,8 +51,8 @@ public class CameraRotationController : MonoBehaviour {
 	void Start () {
 		initGameObjects();
 		initVars();
-		projectPlatformsOnto2D();
-		setPlatformsIn2D();
+		projectPlatformsAndModifiersOnto2D();
+		setGameObjectsIn2D();
 	}
 
 	void Update () {
@@ -82,6 +88,7 @@ public class CameraRotationController : MonoBehaviour {
 		plyrCtrl = player.GetComponent<PlayerController>();
 
 		platforms = GameObject.FindGameObjectsWithTag("Platform");
+		mods = GameObject.FindGameObjectsWithTag ("Modifier");
 	}
 
 	void initVars() {
@@ -97,13 +104,22 @@ public class CameraRotationController : MonoBehaviour {
 			platform.GetComponent<PlatformID>().ID = i;
 			++i;
 		}
+
+		modPos = new Vector3[mods.Length];
+		oldModPos = new Vector3[mods.Length];
+		newModPos = new Vector3[mods.Length];
+		i = 0;
+		foreach(GameObject mod in mods) {
+			modPos[i] = mod.transform.position;
+			++i;
+		}
 	}
 
 	// State machine to handle rotation sequence
 	//     This sequence has 4 steps:
-	//         Transform: pauses the player and moves the platforms back to their real position in 3D
+	//         Transform: pauses the player and moves the platforms and modifiers back to their real position in 3D
 	//         Rotate: rotates the camera to the next view
-	//         Project: moves the platforms back to a 2D position relative to the new view
+	//         Project: moves the platforms and modifiers back to a 2D position relative to the new view
 	//         Done: resumes the player and resets the rotating variable
 	//     Each step has 3 parts (excluding Done):
 	//         Setup: initialize variables, calculate new positions/rotation, etc.
@@ -115,12 +131,12 @@ public class CameraRotationController : MonoBehaviour {
 				switch(subState) {
 					case SUB_STATE.SETUP:
 						pausePlayer();
-						transformPlatformsBackTo3D();
+						transformPlatformsAndModifiersBackTo3D();
 						t = 0.0f;
 						subState = SUB_STATE.PERFORM;
 						break;
 					case SUB_STATE.PERFORM:
-						if( interpolatePlatforms() ) {
+						if( interpolatePlatformsAndModifiers() ) {
 							subState = SUB_STATE.COMPLETE;
 						}
 						break;
@@ -154,11 +170,11 @@ public class CameraRotationController : MonoBehaviour {
 				switch(subState) {
 					case SUB_STATE.SETUP:
 						t = 0.0f;
-						projectPlatformsOnto2D();
+						projectPlatformsAndModifiersOnto2D();
 						subState = SUB_STATE.PERFORM;
 						break;
 					case SUB_STATE.PERFORM:
-						if( interpolatePlatforms() ) {
+						if( interpolatePlatformsAndModifiers() ) {
 							subState = SUB_STATE.COMPLETE;
 						}
 						break;
@@ -174,10 +190,10 @@ public class CameraRotationController : MonoBehaviour {
 		}
 	}
 
-	// method that sets up values for moving platforms from their real 3D position to an appropriate 2D projection
-	//     for front and back view, projects platforms to z = 0
-	//     for side views, projects platforms to x = 0
-	void projectPlatformsOnto2D() {
+	// method that sets up values for moving platforms and modifiers from their real 3D position to an appropriate 2D projection
+	//     for front and back view, projects platforms and modifiers to z = 0
+	//     for side views, projects platforms and modifiers to x = 0
+	void projectPlatformsAndModifiersOnto2D() {
 		float newX, newZ;
 		int i;
 		switch(view) {
@@ -191,6 +207,13 @@ public class CameraRotationController : MonoBehaviour {
 					newPlatformPos[i].z = newZ;
 					++i;
 				}
+				i = 0;
+				foreach(Vector3 pos in modPos) {
+					oldModPos[i] = pos;
+					newModPos[i] = pos;
+					newModPos[i].z = newZ;
+					++i;
+				}
 				break;
 			case VIEW.RIGHT:
 			case VIEW.LEFT:
@@ -202,28 +225,46 @@ public class CameraRotationController : MonoBehaviour {
 					newPlatformPos[i].x = newX;
 					++i;
 				}
+				i = 0;
+				foreach(Vector3 pos in modPos) {
+					oldModPos[i] = pos;
+					newModPos[i] = pos;
+					newModPos[i].x = newX;
+					++i;
+				}
 				break;
 		}
 	}
 
-	// method that sets up values for moving platforms from their current 2D projected position back to their real 3D position
-	void transformPlatformsBackTo3D() {
+	// method that sets up values for moving platforms and modifiers from their current 2D projected position back to their real 3D position
+	void transformPlatformsAndModifiersBackTo3D() {
 		int i = 0;
 		foreach( Vector3 pos in platformPos) {
 			oldPlatformPos[i] = newPlatformPos[i];
 			newPlatformPos[i] = pos;
 			++i;
 		}
+		i = 0;
+		foreach( Vector3 pos in modPos) {
+			oldModPos[i] = newModPos[i];
+			newModPos[i] = pos;
+			++i;
+		}
 	}
 
 	// linearly interpolate between the old position and new position
-	//   lasts for 'platformTransformDuration' seconds before reaching it's destination
-	bool interpolatePlatforms() {
-		t += Time.deltaTime / platformTransformDuration;
+	//   lasts for 'translateDuration' seconds before reaching it's destination
+	bool interpolatePlatformsAndModifiers() {
+		t += Time.deltaTime / translateDuration;
 		int i = 0;
 		if( t >= 1.0f ) {
 			foreach(GameObject platform in platforms) {
 				platform.transform.position = newPlatformPos[i];
+				++i;
+			}
+			i = 0;
+			foreach(GameObject mod in mods) {
+				mod.transform.position = newModPos[i];
 				++i;
 			}
 			return true;
@@ -234,13 +275,19 @@ public class CameraRotationController : MonoBehaviour {
 				platform.transform.position = newPos;
 				++i;
 			}
+			i = 0;
+			foreach(GameObject mod in mods) {
+				Vector3 newPos = oldModPos[i] * (1.0f-t) + newModPos[i] * t;
+				mod.transform.position = newPos;
+				++i;
+			}
 			return false;
 		}
 	}
 
-	// similar to interpolate platforms, but with extra cases because of wrap around (360 degrees = 0 degrees)
+	// similar to interpolate platforms and modifiers, but with extra cases because of wrap around (360 degrees = 0 degrees)
 	bool interpolateCamera() {
-		t += Time.deltaTime / camRotationDuration;
+		t += Time.deltaTime / rotationDuration;
 		if( t >= 1.0f ) {
 			Vector3 newAngle = this.transform.eulerAngles;
 			newAngle.y = newRotation;
@@ -332,8 +379,8 @@ public class CameraRotationController : MonoBehaviour {
 			}
 	}
 
-	// function used in Start() to initially project the player and platforms to z = 0
-	void setPlatformsIn2D() {
+	// function used in Start() to initially project the player, platforms, and modifiers to z = 0
+	void setGameObjectsIn2D() {
 		float newZ = 0.0f;
 		Vector3 newPos = player.transform.position;
 		newPos.z = newZ;
@@ -342,6 +389,11 @@ public class CameraRotationController : MonoBehaviour {
 			newPos = platform.transform.position;
 			newPos.z = newZ;
 			platform.transform.position = newPos;
+		}
+		foreach(GameObject mod in mods) {
+			newPos = mod.transform.position;
+			newPos.z = newZ;
+			mod.transform.position = newPos;
 		}
 	}
 
