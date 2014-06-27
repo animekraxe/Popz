@@ -10,7 +10,7 @@ public class PortalController : MonoBehaviour {
 		pm = GameObject.FindGameObjectWithTag ("Portals").GetComponent<PortalManager>();
 	}
 
-	void OnTriggerEnter (Collider other) {
+	void OnTriggerStay (Collider other) {
 		Teleportable tel = other.gameObject.GetComponent<Teleportable> ();
 		if (tel == null || !tel.canTeleport) { return; }
 		if (pm.portalA == null || pm.portalB == null) { return; }
