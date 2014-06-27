@@ -1,37 +1,43 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RedirectModifier : MonoBehaviour {
+public class Modifier : MonoBehaviour {
 
-	private PlayerController plyrCtrl;
-
+	public GameObject plyr;
+	public PlayerController plyrCtrl;
+	
+	public CameraRotationController camRotCtrl;
+	
 	private ParticleSystem ps;
 	private float initER, initSS;
-
+	
 	private Transform modCube;
-
+	
 	private bool collided;
-
+	
 	private float collisionAnimLength = 1.0f;
 	private float collisionAnimTimer;
-
+	
 	private bool endRotationAnim;
 
 	void Start () {
-		plyrCtrl = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-
+		plyr = GameObject.FindGameObjectWithTag("Player");
+		plyrCtrl = plyr.GetComponent<PlayerController>();
+		
+		camRotCtrl = GameObject.FindGameObjectWithTag("SpinController").GetComponent<CameraRotationController>();
+		
 		ps = this.gameObject.particleSystem;
-
+		
 		modCube = this.transform.parent.FindChild("ModifierCube");
-
+		
 		collided = false;
 		collisionAnimTimer = 0.0f;
-
+		
 		endRotationAnim = false;
 	}
-
+	
 	void Update() {
-
+		
 		if( collided ) {
 			collisionAnimTimer += Time.deltaTime;
 			if( collisionAnimTimer >= collisionAnimLength ) {
@@ -47,7 +53,7 @@ public class RedirectModifier : MonoBehaviour {
 				ps.startSpeed = initSS*3;
 			}
 		}
-
+		
 		if( endRotationAnim ) {
 			if( modCube.transform.rotation.eulerAngles.magnitude < 0.1f ) {
 				modCube.transform.rotation = Quaternion.identity;
@@ -57,25 +63,12 @@ public class RedirectModifier : MonoBehaviour {
 				modCube.transform.rotation = Quaternion.Lerp(modCube.transform.rotation, Quaternion.identity, 0.05f);
 			}
 		}
-
-	}
-	
-	void OnTriggerEnter(Collider col) {
 		
-		if( col.gameObject.tag == "Player" ) {
+	}
 
-			initER = ps.emissionRate;
-			initSS = ps.startSpeed;
-			collided = true;
-
-			if( plyrCtrl.isMovingRight ) {
-				plyrCtrl.isMovingRight = false;
-				plyrCtrl.isMovingLeft = true;
-			}
-			else {
-				plyrCtrl.isMovingLeft = false;
-				plyrCtrl.isMovingRight = true;
-			}
-		}
+	public void triggered() {
+		initER = ps.emissionRate;
+		initSS = ps.startSpeed;
+		collided = true;
 	}
 }
