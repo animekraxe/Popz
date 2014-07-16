@@ -9,6 +9,7 @@ public class PortalManager : MonoBehaviour {
 	public PortalController portalA;
 	public PortalController portalB;
 	private bool createPortal;
+	public bool canCreate = true;
 
 	// Use this for initialization
 	void Start () {
@@ -17,7 +18,7 @@ public class PortalManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetMouseButtonDown (0)) {
+		if (Input.GetMouseButtonDown (0) && canCreate) {
 			createPortal = true;
 		}
 	}
