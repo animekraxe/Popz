@@ -4,44 +4,36 @@ using System.Collections.Generic;
 
 public class Collectible : MonoBehaviour {
 
-	public Color color;
-	public Shape shape;
+	public Color color; 
+	public Shape shape; 
 	public bool selectable = true;
 
-	private Queue<Collectible> pattern;
-	private Queue<Collectible> foundPattern;
-
-
-	// Use this for initialization
+	//public AudioClip success;
+	//public AudioClip fail;
+	
+	private Pattern patternManager;
+	
 	void Start () {
 		renderer.material.color = color;
-		pattern = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern>().pattern;
-		foundPattern = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern>().foundPattern;
+		patternManager = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern> ();
 	}
 
 	void OnMouseDown () {
 		if (!selectable) { return; }
-		Collectible current = pattern.Peek ();
+		Collectible current = patternManager.pattern.Peek ();
 		if (current.color == color && current.shape == shape) {
 			Destroy (gameObject);
-			Collectible c = pattern.Dequeue();
-			foundPattern.Enqueue(c);
-
+			Collectible c = patternManager.pattern.Dequeue ();
+			patternManager.foundPattern.Enqueue (c);
+			//AudioSource.PlayClipAtPoint(success, transform.position);
+		} 
+		else {
+			patternManager.failedPattern = true;
+			//AudioSource.PlayClipAtPoint(fail, transform.position);
 		}
 	}
 
-	void OnTriggerEnter (Collider obj) {
-		if (!obj.gameObject.tag.Equals("Player")) { return; }
-		if (!selectable) { return; }
-		Collectible current = pattern.Peek ();
-		if (current.color == color && current.shape == shape) {
-			Destroy (gameObject);
-			Collectible c = pattern.Dequeue();
-			foundPattern.Enqueue(c);
-			
-		}
-	}
-
+	// If collectible is off screen, delete it
 	void OnBecameInvisible () {
 		if (selectable) {
 			Destroy (gameObject);

@@ -21,7 +21,7 @@ public class CollectiblesGenerator : MonoBehaviour {
 			StartCoroutine(SpawnCollectible());
 			start = false;
 		}
-		spawnTime = Random.Range (0.5f, 2f);
+		spawnTime = Random.Range (0.6f, 1.7f);
 	}
 	
 	
