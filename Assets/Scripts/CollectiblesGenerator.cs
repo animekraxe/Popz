@@ -3,43 +3,40 @@ using System.Collections;
 
 public class CollectiblesGenerator : MonoBehaviour {
 
-	public float spawnTime = 2f;
-	public float spawnChance = 0.5f;
-	private Transform[] collectibles;
-	private bool start = true;
-	private Grid grid;
+	public Transform[] collectibles;
+	public float spawnChance = 0.8f;
 
-	// Use this for initialization
+	private Grid grid;
+	
 	void Start () {
-		collectibles = GameObject.FindGameObjectWithTag("Pattern").GetComponent<Pattern>().collectibles;
+		collectibles = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern> ().collectibles;
 		grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (start) {
-			StartCoroutine(SpawnCollectible());
-			start = false;
-		}
-		spawnTime = Random.Range (0.6f, 1.7f);
-	}
-	
-	
-	IEnumerator SpawnCollectible() {
-		while(true) {
-			for (int height = 0; height < grid.numCellsY; height++) {
-				if (Random.value > spawnChance) {
+		if (!grid.GenerateCollectibles) { return; }
+
+		for (int x = 0; x < grid.numCellsX; x++) {
+			for (int y = 0; y < grid.numCellsY; y++) {
+				if (Random.value > spawnChance || !grid.containsObject(x,y)) {
 					continue;
 				}
-				int type = Random.Range (0, collectibles.Length);
-				Vector3 spawnPoint = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight/2));
-				spawnPoint.y = grid.playerPos.y + ((float) height) * grid.cellSize + (grid.cellSize/2f); 
-				Transform t = GameObject.Instantiate (collectibles [type], new Vector3(spawnPoint.x,spawnPoint.y,0), Quaternion.identity) as Transform;
-				t.parent = this.gameObject.transform;
-
+				int collectibleType = Random.Range (0, collectibles.Length);
+				GenerateCollectible (x, y, collectibleType);
 			}
-			yield return new WaitForSeconds(spawnTime);
 		}
+		grid.GenerateCollectibles = false;
+
 	}
+	
+	private void GenerateCollectible (int x, int y, int type) {
+		Vector3 spawnPos = grid.GridToWorld (x,y); 
+		Transform t = GameObject.Instantiate (collectibles [type], spawnPos, Quaternion.identity) as Transform;
+		t.parent = this.gameObject.transform;
+		Collectible col = t.gameObject.GetComponent<Collectible>();
+		col.gameObject.layer = 9;
+	}
+
 
 }

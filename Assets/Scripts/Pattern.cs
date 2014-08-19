@@ -2,19 +2,34 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum Shape { Sphere, Cube, Capsule }; // Possible shapes of collectibles
-public enum Order { Forward, Backward, Custom }; // Possible orderings of collectibles
+
+public enum Order { Forward, Backward }; // Possible orderings of collectibles
 
 public class Pattern : MonoBehaviour {
 
-	public Transform[] collectibles; // The collectibles that have the possibility of appearing in the pattern
-	public Queue<Collectible> pattern; // Collectibles in the pattern that they player has not clicked on yet
-	public Queue<Collectible> foundPattern; // Collectibles in the pattern that the player has clicked on already
-
+	public Transform[] collectibles; // Possible collectibles in the pattern
 	public int patternLength = 1; // Number of collectibles in the pattern
-	private bool display = false; // True only when a new pattern is generated
+	public bool display = false; // Displays pattern when true
 	public bool failedPattern = false; // True when player clicks on the incorrect collectible
-	public int hints = 3;
+	public Order order = Order.Forward;
+	public int numLives = 3; // Number of mistakes player can make before pattern length is decremented
+	public int numRounds = 5; // Number of rounds player must complete before pattern length is incremented
+
+	private Queue<Collectible> pattern; // Collectibles in the pattern that they player has not clicked on yet
+	private Queue<Collectible> foundPattern; // Collectibles in the pattern that the player has clicked on already
+
+	//private Collectible outline; // Collectible used as outline
+	private Collectible currentOutlined; // Collectible that is currently outlined
+
+	private int livesPerCollection;
+	private int roundsPerCollection;
+	private int resistance = 2;
+	private bool hid = true;
+	private bool start = true;
+
+	public Collectible current { 
+		get { return pattern.Peek (); }  
+	}
 
 	void Start () {
 		if (collectibles == null) {
@@ -22,43 +37,72 @@ public class Pattern : MonoBehaviour {
 		}
 		pattern = new Queue<Collectible> ();
 		foundPattern = new Queue<Collectible> ();
+		livesPerCollection = numLives;
+		roundsPerCollection = numRounds;
 	}
 
 	void Update () {
+		if(start) {
+			GeneratePattern(patternLength);
+			start = false;
+		}
+
 		if (pattern.Count == 0) {
-			patternLength++;
+			if (numRounds > 1) {
+				numRounds--;
+			}
+			else {
+				numLives = livesPerCollection;
+				numRounds = roundsPerCollection;
+				patternLength++;
+			}
 			GeneratePattern(patternLength);
 		}
 		else if (failedPattern) {
-			if (patternLength > 1) {
-				patternLength--;
+			if (numLives > 1) {
+				numLives--;
+				RevealPattern ();
 			}
+			else {
+				numRounds = roundsPerCollection;
+				numLives = livesPerCollection;
+				if (patternLength > 2) {
+					patternLength--;
+				}
+				GeneratePattern(patternLength);
+			}
+			failedPattern = false;	
+		}
+
+		// Skips and generates new pattern is "s" is pressed
+		if (Input.GetKeyDown ("s")) {
 			GeneratePattern(patternLength);
-			failedPattern = false;
 		}
 
-		// Displays pattern when "d" is pressed or when a new pattern has just been generated
-		if (Input.GetKeyDown ("d") && hints > 0 && !display) {
-			StartCoroutine(RevealPattern(((float)patternLength) * 0.6f, true));
-		}
-
+		// Displays pattern when a hint is used or when a new pattern has just been generated
 		if (display) {
 			DisplayPattern();
 		}
-		else {
+		else if (!hid) {
 			HidePattern();
 		}
 	}
 
 	// Displays the pattern to the player
 	private void DisplayPattern () {
-		Collectible current = pattern.Peek ();
-		current.renderer.material.color = Color.white;
+		hid = false;
+		if (currentOutlined == null || pattern.Peek ().GetInstanceID () != currentOutlined.GetInstanceID ()) {
+			//if (outline != null) {
+				//Destroy(outline.gameObject);
+			//}
+			currentOutlined = pattern.Peek ();
+			//outline = CreateOutline (currentOutlined);
+		}
+		//outline.renderer.enabled = true;
 		foreach (var c in pattern) {
 			c.gameObject.renderer.enabled = true;
 		}
 		foreach (var c in foundPattern) {
-			c.renderer.material.color = c.color;
 			c.gameObject.renderer.enabled = true;
 		}
 
@@ -66,6 +110,8 @@ public class Pattern : MonoBehaviour {
 
 	// Hides the pattern from the player
 	private void HidePattern () {
+		hid = true;
+		//outline.gameObject.renderer.enabled = false;
 		foreach (var c in pattern) {
 			c.gameObject.renderer.enabled = false;
 		}
@@ -75,21 +121,74 @@ public class Pattern : MonoBehaviour {
 	}
 
 	// Reveals the pattern to the player for the specified amount of time
-	IEnumerator RevealPattern(float displayTime, bool hint) {
-		if (hint) {
-			hints--;
-		}
+	IEnumerator RevealPattern(float displayTime) {
 		display = true;
 		yield return new WaitForSeconds(displayTime);  
 		display = false;
 	}
 
-	// Creates a pattern of the specified length
+	private int previous = -1;
+
+	// Creates a pattern of the specified lengthz
 	private void GeneratePattern (int length) {
-		if (display) {
-			display = false;
-			StopCoroutine ("RevealPattern");
+		DestroyPattern ();
+		Vector3 startPos = transform.position;
+		Vector3 offset = new Vector3 (1.3f, 0f, 0f);
+
+
+		switch (order) {
+			case Order.Forward:
+				for (int i = 0; i < length; i++) {
+					int randNum = Random.Range (0, collectibles.Length);
+					for (int j = 0; j < resistance; j++) {
+						if (previous == randNum) {
+							randNum = Random.Range (0, collectibles.Length);
+						}
+						else {
+							break;
+						}
+					}
+					previous = randNum;
+					
+					pattern.Enqueue(CreatePatternCollectible(randNum, startPos));
+					startPos = startPos + offset;
+				}
+				break;
+			case Order.Backward:
+				Stack<Collectible> tempStack = new Stack<Collectible>();
+				for (int i = 0; i < length; i++) {
+					int randNum = Random.Range (0, collectibles.Length);
+					for (int j = 0; j < resistance; j++) {
+						if (previous == randNum) {
+							randNum = Random.Range (0, collectibles.Length);
+						}
+						else {
+							break;
+						}
+					}
+					previous = randNum;
+					
+					tempStack.Push(CreatePatternCollectible(randNum, startPos));
+					startPos = startPos + offset;
+				}
+				while (tempStack.Count > 0) {
+					pattern.Enqueue(tempStack.Pop());
+				}
+				break;
+			default:
+				Debug.Log ("Pattern ordering type is not specified.");
+				break;
 		}
+		StartCoroutine("RevealPattern",((float)length) * 0.6f);
+	}
+
+	// Destroys the current pattern
+	private void DestroyPattern () {
+		if (display) {
+			StopCoroutine ("RevealPattern");
+			display = false;
+		}
+
 		foreach (var c in pattern) {
 			Destroy(c.gameObject);
 		}
@@ -98,20 +197,43 @@ public class Pattern : MonoBehaviour {
 		}
 		pattern.Clear ();
 		foundPattern.Clear();
-		Vector3 startPos = transform.position;
-		Vector3 offset = new Vector3 (1f, 0f, 0f);
+	}
 
-		for (int i = 0; i < length; i++) {
-			int randNum = Random.Range (0, collectibles.Length);
-			Transform t = GameObject.Instantiate (collectibles [randNum], startPos, Quaternion.identity) as Transform;
-			t.parent = this.gameObject.transform;
-			Collectible c = t.gameObject.GetComponent<Collectible>();
-			c.selectable = false;
-			c.gameObject.layer = 8;
-			pattern.Enqueue(c);
-			startPos = startPos + offset;
-		}
+	// Creates a nonselectable collectible of the specified type and at the specified position
+	private Collectible CreatePatternCollectible (int type, Vector3 pos) {
+		Transform t = GameObject.Instantiate (collectibles [type], pos, Quaternion.identity) as Transform;
+		t.parent = this.gameObject.transform;
+		Collectible col = t.gameObject.GetComponent<Collectible>();
+		col.selectable = false;
+		col.gameObject.layer = 9;
+		col.type = type;
+		col.gameObject.renderer.enabled = false;
+		return col;
+	}
 
-		StartCoroutine(RevealPattern(((float)length) * 0.6f, false));
+	// Create a white outline for the specified collectible
+	private Collectible CreateOutline (Collectible c) {
+		Transform t = GameObject.Instantiate (collectibles[c.type], c.transform.position, Quaternion.identity) as Transform;
+		t.parent = c.transform;
+		Collectible outline = t.gameObject.GetComponent<Collectible>();
+		outline.selectable = false;
+		outline.gameObject.layer = 8;
+		outline.type = c.type;
+
+		outline.transform.localScale = new Vector3 (1.1f, 1.1f, 1.1f);
+		outline.renderer.material.color = Color.white;
+		outline.color = Color.white;
+
+		return outline;
+	}
+
+	public void RevealPattern () {
+		StartCoroutine("RevealPattern",((float)patternLength) * 0.6f);
+	}
+
+	// Called when the player clicks the correct collectible
+	public void foundCollectible () {
+		Collectible c = pattern.Dequeue ();
+		foundPattern.Enqueue (c);
 	}
 }

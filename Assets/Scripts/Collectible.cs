@@ -2,34 +2,34 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum Species { Plant1, Plant2, Plant3, Plant4, Sphere, Cube, Capsule }; // Possible plant species
+
 public class Collectible : MonoBehaviour {
 
 	public Color color; 
-	public Shape shape; 
+	public Species species; 
 	public bool selectable = true;
+	public int type;
 
-	//public AudioClip success;
-	//public AudioClip fail;
+	public AudioClip success;
+	public AudioClip fail;
 	
-	private Pattern patternManager;
+	private Pattern pattern;
 	
 	void Start () {
-		renderer.material.color = color;
-		patternManager = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern> ();
+		pattern = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern> ();
 	}
 
 	void OnMouseDown () {
-		if (!selectable) { return; }
-		Collectible current = patternManager.pattern.Peek ();
-		if (current.color == color && current.shape == shape) {
+		if (!selectable || pattern.display) { return; }
+		if (pattern.current.color == color && pattern.current.species == species) {
 			Destroy (gameObject);
-			Collectible c = patternManager.pattern.Dequeue ();
-			patternManager.foundPattern.Enqueue (c);
-			//AudioSource.PlayClipAtPoint(success, transform.position);
+			pattern.foundCollectible();
+			AudioSource.PlayClipAtPoint(success, transform.position);
 		} 
 		else {
-			patternManager.failedPattern = true;
-			//AudioSource.PlayClipAtPoint(fail, transform.position);
+			pattern.failedPattern = true;
+			AudioSource.PlayClipAtPoint(fail, transform.position);
 		}
 	}
 
