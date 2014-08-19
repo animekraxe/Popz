@@ -18,8 +18,10 @@ public class Pattern : MonoBehaviour {
 	private Queue<Collectible> pattern; // Collectibles in the pattern that they player has not clicked on yet
 	private Queue<Collectible> foundPattern; // Collectibles in the pattern that the player has clicked on already
 
-	//private Collectible outline; // Collectible used as outline
+	//private Collectible outline; // Collectible used as outline for shapes
 	private Collectible currentOutlined; // Collectible that is currently outlined
+	public Transform highlightPrefab;
+	private Transform highlight;
 
 	private int livesPerCollection;
 	private int roundsPerCollection;
@@ -39,6 +41,10 @@ public class Pattern : MonoBehaviour {
 		foundPattern = new Queue<Collectible> ();
 		livesPerCollection = numLives;
 		roundsPerCollection = numRounds;
+	
+		highlight = GameObject.Instantiate (highlightPrefab, transform.position, Quaternion.identity) as Transform;
+		highlight.parent = this.gameObject.transform;
+		highlight.renderer.material.color = Color.grey;
 	}
 
 	void Update () {
@@ -96,9 +102,11 @@ public class Pattern : MonoBehaviour {
 				//Destroy(outline.gameObject);
 			//}
 			currentOutlined = pattern.Peek ();
+			highlight.position = currentOutlined.transform.position;
 			//outline = CreateOutline (currentOutlined);
 		}
 		//outline.renderer.enabled = true;
+		highlight.renderer.enabled = true;
 		foreach (var c in pattern) {
 			c.gameObject.renderer.enabled = true;
 		}
@@ -112,6 +120,7 @@ public class Pattern : MonoBehaviour {
 	private void HidePattern () {
 		hid = true;
 		//outline.gameObject.renderer.enabled = false;
+		highlight.renderer.enabled = false;
 		foreach (var c in pattern) {
 			c.gameObject.renderer.enabled = false;
 		}

@@ -4,7 +4,7 @@ using System.Collections;
 public class CollectiblesGenerator : MonoBehaviour {
 
 	public Transform[] collectibles;
-	public float spawnChance = 0.8f;
+	public float spawnChance = 0.85f;
 
 	private Grid grid;
 	
