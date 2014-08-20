@@ -14,7 +14,7 @@ public class Creature : MonoBehaviour {
 
 	private GameObject cloakObjectRef;
 	private float cloakTicker;
-	private float uncloakWaitTime = 2;
+	private float uncloakWaitTime = 3;
 
 	public Vector3 target;
 	private float speed = 3;
@@ -24,11 +24,14 @@ public class Creature : MonoBehaviour {
 
 	private int direction;
 
+	private bool canBeSelected;
+
 	// Use this for initialization
 	void Start () {
 		moveTicker = 0;
 		cloakTicker = uncloakWaitTime;
 		cloaked = true;
+		canBeSelected = true;
 		direction = 1;
 
 		initMaterial = this.renderer.material;
@@ -39,8 +42,8 @@ public class Creature : MonoBehaviour {
 
 		leftBound = GameObject.FindGameObjectWithTag("bPoint1").GetComponent<WayPoint>();
 		rightBound = GameObject.FindGameObjectWithTag("bPoint2").GetComponent<WayPoint>();
-		topBound = GameObject.FindGameObjectWithTag("bPoint3").GetComponent<WayPoint>();
-		bottomBound = GameObject.FindGameObjectWithTag("bPoint4").GetComponent<WayPoint>();
+		topBound = GameObject.FindGameObjectWithTag("bPoint4").GetComponent<WayPoint>();
+		bottomBound = GameObject.FindGameObjectWithTag("bPoint3").GetComponent<WayPoint>();
 //		currentTarget = 5;
 	}
 	
@@ -55,6 +58,7 @@ public class Creature : MonoBehaviour {
 		checkReveal();
 		Vector3 zeroZ = new Vector3(transform.position.x, transform.position.y, 0);
 		transform.position = zeroZ;
+		checkInBounds();
 	}
 
 	private void moveUpdate () {
@@ -70,8 +74,10 @@ public class Creature : MonoBehaviour {
 	}
 
 	private void setCloak () {
-		if (cloakTicker >= uncloakWaitTime)
+		if (cloakTicker >= uncloakWaitTime) {
 			cloaked = true;
+			canBeSelected = true;
+		}
 
 		if (cloaked) {
 			this.GetComponent<MeshFilter>().mesh = cloakObjectRef.GetComponent<MeshFilter>().mesh;
@@ -114,7 +120,30 @@ public class Creature : MonoBehaviour {
 		if (Input.GetKey(KeyCode.Space)) {
 			cloaked = false;
 			cloakTicker = 0;
+			canBeSelected = false;
 		}
+	}
+
+	private void checkInBounds () {
+		float xMin = leftBound.transform.position.x;
+		float xMax = rightBound.transform.position.x;
+		float yMax = topBound.transform.position.y;
+		float yMin = bottomBound.transform.position.y;
+
+		if (transform.position.x < xMin || transform.position.x > xMax
+		    || transform.position.y < yMin) {
+
+			transform.position = new Vector3(xMin + 1, yMax - 1, 0);
+			moveTicker = moveWaitTime;
+		}
+		else if (transform.position.y >yMax) {
+			transform.position = new Vector3(transform.position.x, yMax - 1, 0);
+			moveTicker = moveWaitTime;
+		}
+	}
+
+	public bool getSelectable () {
+		return canBeSelected;
 	}
 
 	void OnCollisionEnter(Collision collision) {
