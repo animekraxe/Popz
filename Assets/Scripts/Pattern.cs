@@ -183,7 +183,7 @@ public class Pattern : MonoBehaviour {
 				Debug.Log ("Pattern ordering type is not specified.");
 				break;
 		}
-		StartCoroutine("RevealPattern",((float)length) * 0.6f);
+		StartCoroutine("RevealPattern",((float)length) * 0.62f);
 	}
 
 	// Destroys the current pattern
@@ -216,7 +216,7 @@ public class Pattern : MonoBehaviour {
 	}
 
 	public void RevealPattern () {
-		StartCoroutine("RevealPattern",((float)patternLength) * 0.6f);
+		StartCoroutine("RevealPattern",((float)patternLength) * 0.62f);
 	}
 
 	// Called when the player clicks the correct collectible
