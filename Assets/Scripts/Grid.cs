@@ -20,6 +20,7 @@ public class Grid : MonoBehaviour {
 		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
 		Vector3 topLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, Camera.main.pixelHeight, 0f));
 		offset = topRight - topLeft;
+
 		//numCellsX = (int) (offset.x / cellSizeX);
 
 		grid = new bool[numCellsX + pg.maxCellLength - 1, numCellsY];
