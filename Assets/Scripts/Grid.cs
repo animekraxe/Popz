@@ -7,7 +7,8 @@ public class Grid : MonoBehaviour {
 	public bool GeneratePlatforms; // True when platforms will be generated
 	public bool GenerateCollectibles;
 	 
-	public float cellSizeX, cellSizeY; // Cell size in horizontal and vertical directions
+	public float cellSizeY; // Cell size in horizontal and vertical directions
+	public float cellSizeX;
 	private bool[,] grid; // grid[x,y] is true is the grid cell (x,y) contains an object
 	private Vector3 offset;
 
@@ -19,12 +20,14 @@ public class Grid : MonoBehaviour {
 		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
 		Vector3 topLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, Camera.main.pixelHeight, 0f));
 		offset = topRight - topLeft;
+		//numCellsX = (int) (offset.x / cellSizeX);
 
 		grid = new bool[numCellsX + pg.maxCellLength - 1, numCellsY];
 		Transform player = GameObject.FindGameObjectWithTag ("Player").transform;
 		Vector3 playerPos = player.position + new Vector3 (0f, player.localScale.y / 2f, 0f);
 		cellSizeY = (topRight.y - playerPos.y) / ((float)numCellsY);
 		cellSizeX = (topRight.x - topLeft.x) / ((float)numCellsX);
+
 
 		Vector3 temp = (topRight - new Vector3(0f, ((float) numCellsY) * cellSizeY, 0f)) + offset;
 		temp.z = 0f;
