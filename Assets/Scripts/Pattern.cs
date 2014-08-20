@@ -14,20 +14,18 @@ public class Pattern : MonoBehaviour {
 	public Order order = Order.Forward;
 	public int numLives = 3; // Number of mistakes player can make before pattern length is decremented
 	public int numRounds = 5; // Number of rounds player must complete before pattern length is incremented
+	public bool transition = false;
 
 	private Queue<Collectible> pattern; // Collectibles in the pattern that they player has not clicked on yet
 	private Queue<Collectible> foundPattern; // Collectibles in the pattern that the player has clicked on already
-
-	//private Collectible outline; // Collectible used as outline for shapes
-	private Collectible currentOutlined; // Collectible that is currently outlined
-	public Transform highlightPrefab;
+	
+	private Collectible currentHighlighted; // Collectible that is currently outlined
 	private Transform highlight;
 
 	private int livesPerCollection;
 	private int roundsPerCollection;
 	private int resistance = 2;
 	private bool hid = true;
-	private bool start = true;
 
 	public Collectible current { 
 		get { return pattern.Peek (); }  
@@ -42,16 +40,14 @@ public class Pattern : MonoBehaviour {
 		livesPerCollection = numLives;
 		roundsPerCollection = numRounds;
 	
-		highlight = GameObject.Instantiate (highlightPrefab, transform.position, Quaternion.identity) as Transform;
+		highlight = GameObject.FindGameObjectWithTag ("Highlight").transform;
 		highlight.parent = this.gameObject.transform;
 		highlight.renderer.material.color = Color.grey;
+		GeneratePattern(patternLength);
+
 	}
 
 	void Update () {
-		if(start) {
-			GeneratePattern(patternLength);
-			start = false;
-		}
 
 		if (pattern.Count == 0) {
 			if (numRounds > 1) {
@@ -74,8 +70,9 @@ public class Pattern : MonoBehaviour {
 				numLives = livesPerCollection;
 				if (patternLength > 2) {
 					patternLength--;
+					StartCoroutine("Transition");
 				}
-				GeneratePattern(patternLength);
+
 			}
 			failedPattern = false;	
 		}
@@ -92,20 +89,19 @@ public class Pattern : MonoBehaviour {
 		else if (!hid) {
 			HidePattern();
 		}
+
+		if (Input.GetKeyDown ("q")) {
+			StartCoroutine("Transition",3f);
+		}
 	}
 
 	// Displays the pattern to the player
 	private void DisplayPattern () {
 		hid = false;
-		if (currentOutlined == null || pattern.Peek ().GetInstanceID () != currentOutlined.GetInstanceID ()) {
-			//if (outline != null) {
-				//Destroy(outline.gameObject);
-			//}
-			currentOutlined = pattern.Peek ();
-			highlight.position = currentOutlined.transform.position;
-			//outline = CreateOutline (currentOutlined);
+		if (currentHighlighted == null || pattern.Peek ().GetInstanceID () != currentHighlighted.GetInstanceID ()) {
+			currentHighlighted = pattern.Peek ();
+			highlight.position = currentHighlighted.transform.position;
 		}
-		//outline.renderer.enabled = true;
 		highlight.renderer.enabled = true;
 		foreach (var c in pattern) {
 			c.gameObject.renderer.enabled = true;
@@ -119,7 +115,6 @@ public class Pattern : MonoBehaviour {
 	// Hides the pattern from the player
 	private void HidePattern () {
 		hid = true;
-		//outline.gameObject.renderer.enabled = false;
 		highlight.renderer.enabled = false;
 		foreach (var c in pattern) {
 			c.gameObject.renderer.enabled = false;
@@ -220,22 +215,6 @@ public class Pattern : MonoBehaviour {
 		return col;
 	}
 
-	// Create a white outline for the specified collectible
-	private Collectible CreateOutline (Collectible c) {
-		Transform t = GameObject.Instantiate (collectibles[c.type], c.transform.position, Quaternion.identity) as Transform;
-		t.parent = c.transform;
-		Collectible outline = t.gameObject.GetComponent<Collectible>();
-		outline.selectable = false;
-		outline.gameObject.layer = 8;
-		outline.type = c.type;
-
-		outline.transform.localScale = new Vector3 (1.1f, 1.1f, 1.1f);
-		outline.renderer.material.color = Color.white;
-		outline.color = Color.white;
-
-		return outline;
-	}
-
 	public void RevealPattern () {
 		StartCoroutine("RevealPattern",((float)patternLength) * 0.6f);
 	}
@@ -244,5 +223,23 @@ public class Pattern : MonoBehaviour {
 	public void foundCollectible () {
 		Collectible c = pattern.Dequeue ();
 		foundPattern.Enqueue (c);
+	}
+
+	IEnumerator Transition () {
+		transition = true;
+		Runner camera = Camera.main.GetComponent<Runner> ();
+		BackgroundScroller bg = GameObject.FindGameObjectWithTag ("Background").GetComponent <BackgroundScroller> ();
+		float cameraSpeed = camera.speed;
+		float backgroundSpeed = bg.speed;
+		camera.speed = cameraSpeed * 40f;
+		bg.speed = 10f * backgroundSpeed;
+		yield return new WaitForSeconds(0.8f);
+		 
+		camera.speed = cameraSpeed;
+		bg.speed = backgroundSpeed;
+		GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ().ResetGridPosition (); 
+		transition = false;
+		GeneratePattern(patternLength);
+
 	}
 }

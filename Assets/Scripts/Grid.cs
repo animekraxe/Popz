@@ -74,4 +74,11 @@ public class Grid : MonoBehaviour {
 	public bool containsObject (int x, int y) {
 		return grid[x,y];
 	}
+
+	public void ResetGridPosition () {
+		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
+		Vector3 temp = (topRight - new Vector3(0f, ((float) numCellsY) * cellSizeY, 0f)) + offset;
+		temp.z = 0f;
+		transform.position = temp;
+	}
 }

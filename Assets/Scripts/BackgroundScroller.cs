@@ -3,15 +3,15 @@ using System.Collections;
 
 public class BackgroundScroller : MonoBehaviour {
 
-	public float speed = 0.0007f;
-	private float pos = 0f;
+	public float speed = -0.02f;
+	private float position = 0f;
 
 	// Update is called once per frame
 	void Update () {
-		pos -= speed;
-		if (pos < 0f) {
-			pos += 1.0f;
+		position -= speed * Time.deltaTime;
+		if (position < 0f) {
+			position += 1f;
 		}
-		renderer.material.mainTextureOffset = new Vector2 (pos, 0);
+		renderer.material.mainTextureOffset = new Vector2 (position, 0);
 	}
 }

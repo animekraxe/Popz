@@ -7,10 +7,12 @@ public class PlatformGenerator : MonoBehaviour {
 	public float spawnChance = 0.6f; // The chance a platform will be generated in a grid cell
 
 	private Grid grid; // Reference to the grid used
+	private Pattern pattern; // Reference to the pattern used
 	public int maxCellLength = 1;
 
 	void Awake() {
 		grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
+		pattern = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern> ();
 		for (int i = 0; i < platforms.Length; i++) {
 			if (platforms[i].numCells > maxCellLength) {
 				maxCellLength = platforms[i].numCells;
@@ -20,7 +22,7 @@ public class PlatformGenerator : MonoBehaviour {
 	
 	// Generates platforms
 	void Update () {
-		if (!grid.GeneratePlatforms) { return; }
+		if (!grid.GeneratePlatforms || pattern.transition) { return; }
 
 		for (int x = 0; x < grid.numCellsX; x++) {
 			for (int y = 0; y < grid.numCellsY; y++) {
