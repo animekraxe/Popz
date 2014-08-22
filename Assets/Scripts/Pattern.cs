@@ -27,24 +27,36 @@ public class Pattern : MonoBehaviour {
 	private int resistance = 2;
 	private bool hid = true;
 
+	public int maxPatternLength;
+
 	public Collectible current { 
 		get { return pattern.Peek (); }  
 	}
 
 	void Start () {
-		if (collectibles == null) {
-			Debug.Log ("Collectibles array is empty.");
-		}
+				
+		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
+		bottomLeft.x += 1f;
+		GameObject ground = GameObject.FindGameObjectWithTag ("Ground");
+		bottomLeft.y += ground.GetComponent<SpriteRenderer> ().sprite.bounds.extents.y * ground.transform.localScale.y;
+		bottomLeft.z = 1f;
+
+		transform.position = bottomLeft;
+
 		pattern = new Queue<Collectible> ();
 		foundPattern = new Queue<Collectible> ();
 		livesPerCollection = numLives;
 		roundsPerCollection = numRounds;
 	
 		highlight = GameObject.FindGameObjectWithTag ("Highlight").transform;
-		highlight.parent = this.gameObject.transform;
 		highlight.renderer.material.color = Color.grey;
 		GeneratePattern(patternLength);
 
+		Vector3 spriteSize = collectibles [0].GetComponent<SpriteRenderer> ().sprite.bounds.size;
+		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
+		Vector3 topLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, Camera.main.pixelHeight, 0f));
+		float length = topRight.x - topLeft.x - 3f;
+		maxPatternLength = Mathf.FloorToInt(length / (spriteSize.x * collectibles[0].localScale.x));
 	}
 
 	void Update () {
@@ -56,7 +68,9 @@ public class Pattern : MonoBehaviour {
 			else {
 				numLives = livesPerCollection;
 				numRounds = roundsPerCollection;
-				patternLength++;
+				if (patternLength < maxPatternLength) {
+					patternLength++;
+				}
 			}
 			GeneratePattern(patternLength);
 		}
@@ -183,7 +197,7 @@ public class Pattern : MonoBehaviour {
 				Debug.Log ("Pattern ordering type is not specified.");
 				break;
 		}
-		StartCoroutine("RevealPattern",((float)length) * 0.62f);
+		StartCoroutine("RevealPattern",((float)length) * 0.65f);
 	}
 
 	// Destroys the current pattern
@@ -216,7 +230,7 @@ public class Pattern : MonoBehaviour {
 	}
 
 	public void RevealPattern () {
-		StartCoroutine("RevealPattern",((float)patternLength) * 0.62f);
+		StartCoroutine("RevealPattern",((float)patternLength) * 0.65f);
 	}
 
 	// Called when the player clicks the correct collectible
@@ -228,7 +242,7 @@ public class Pattern : MonoBehaviour {
 	IEnumerator Transition () {
 		transition = true;
 		Runner camera = Camera.main.GetComponent<Runner> ();
-		BackgroundScroller bg = GameObject.FindGameObjectWithTag ("Background").GetComponent <BackgroundScroller> ();
+		BackgroundManager bg = GameObject.FindGameObjectWithTag ("Backgrounds").GetComponent <BackgroundManager> ();
 		float cameraSpeed = camera.speed;
 		float backgroundSpeed = bg.speed;
 		camera.speed = cameraSpeed * 40f;

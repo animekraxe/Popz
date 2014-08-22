@@ -3,8 +3,8 @@ using System.Collections;
 
 public class CollectiblesGenerator : MonoBehaviour {
 
-	public Transform[] collectibles;
-	public float spawnChance = 0.85f;
+	public Transform[] collectibles; // Possible collectibles that will be generated
+	public float spawnChance = 0.85f; // The chance a collectible will be generated in a grid cell
 
 	private Grid grid;
 	
@@ -13,7 +13,7 @@ public class CollectiblesGenerator : MonoBehaviour {
 		grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
 	}
 	
-	// Update is called once per frame
+	// Generates collectibles
 	void Update () {
 		if (!grid.GenerateCollectibles) { return; }
 
@@ -29,7 +29,8 @@ public class CollectiblesGenerator : MonoBehaviour {
 		grid.GenerateCollectibles = false;
 
 	}
-	
+
+	// Generates collectible of the specified type at the grid location (x,y)
 	private void GenerateCollectible (int x, int y, int type) {
 		Vector3 spawnPos = grid.GridToWorld (x,y); 
 		Transform t = GameObject.Instantiate (collectibles [type], spawnPos, Quaternion.identity) as Transform;

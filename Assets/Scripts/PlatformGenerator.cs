@@ -4,7 +4,7 @@ using System.Collections;
 public class PlatformGenerator : MonoBehaviour {
 
 	public Platform[] platforms; // Possible platforms that will be generated
-	public float spawnChance = 0.6f; // The chance a platform will be generated in a grid cell
+	public float spawnChance = 0.7f; // The chance a platform will be generated in a grid cell
 
 	private Grid grid; // Reference to the grid used
 	private Pattern pattern; // Reference to the pattern used
