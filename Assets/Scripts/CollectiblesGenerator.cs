@@ -4,7 +4,7 @@ using System.Collections;
 public class CollectiblesGenerator : MonoBehaviour {
 
 	public Transform[] collectibles; // Possible collectibles that will be generated
-	public float spawnChance = 0.85f; // The chance a collectible will be generated in a grid cell
+	public float spawnChance = 0.9f; // The chance a collectible will be generated in a grid cell
 
 	private Grid grid;
 	
