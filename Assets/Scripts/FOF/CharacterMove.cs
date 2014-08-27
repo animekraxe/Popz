@@ -5,18 +5,21 @@ public class CharacterMove : MonoBehaviour {
 
 	public Transform followingCamera;
 	public WayPoint endMarker;
+	public WayPoint charEndMark;
 	private Vector3 charTarget;
 	private Vector3 camTarget;
-	public float speed = 1.0F;
+	public float speed;
 	private float startTime;
 	private float charJourneyLength;
 	private float camJourneyLength;
-	public float smooth = 5.0F;
+	public float smooth;
 
 	void Start() {
+		speed = 0.1F;
+		smooth = 5.0F;
 		startTime = Time.time;
-		charTarget = endMarker.transform.position;
-		charTarget.y = transform.position.y;
+		charTarget = charEndMark.transform.position;
+		charTarget.x = transform.position.x;
 		charTarget.z = 0;
 		camTarget = endMarker.transform.position;
 		charJourneyLength = Vector3.Distance(transform.position, charTarget);

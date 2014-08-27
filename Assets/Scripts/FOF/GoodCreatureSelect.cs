@@ -12,6 +12,9 @@ public class GoodCreatureSelect : MonoBehaviour {
 	private int hasBeenSelected;
 	public bool canBeSelected;
 
+	public AudioSource correctSound;
+	public AudioSource wrongSound;
+
 	// Use this for initialization
 	void Start () {
 		hasBeenSelected = 0;
@@ -76,9 +79,11 @@ public class GoodCreatureSelect : MonoBehaviour {
 		if (other.GetComponent<Carrier>().selectionID == selectionID) {
 			spawner.removeCreature();
 			Destroy(gameObject);
+			correctSound.Play();
 		} 
 		else {
 			manager.setPenalty();
+			wrongSound.Play();
 		}
 	}
 }

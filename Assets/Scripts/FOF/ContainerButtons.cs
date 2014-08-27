@@ -9,6 +9,8 @@ public class ContainerButtons : MonoBehaviour {
 //	private string findName;
 	public SpawnCreatures levelStart;
 
+	private GameObject[] creatures;
+
 	private int toolbarWidth = 500;
 	private int toolbarHeight = 50;
 	
@@ -29,9 +31,18 @@ public class ContainerButtons : MonoBehaviour {
 	}
 
 	void OnGUI() {
-		selection = GUI.Toolbar(new Rect(Screen.width/2 - toolbarWidth/2, 
-		                                Screen.height - toolbarHeight, toolbarWidth, toolbarHeight), 
-		                        		selection, selectSet.ToArray());
+//		selection = GUI.Toolbar(new Rect(Screen.width/2 - toolbarWidth/2, 
+//		                                Screen.height - toolbarHeight, toolbarWidth, toolbarHeight), 
+//		                        		selection, selectSet.ToArray());
+
+		if (GUI.Button(new Rect(10, Screen.height - 60, 50, 50), "Light")) {
+			if (creatures == null)
+				creatures = GameObject.FindGameObjectsWithTag("creature");
+			
+			foreach (GameObject creature in creatures) {
+				creature.GetComponent<Creature>().reveal();
+			}
+		}
 	}
 
 	public int getSelection () {
@@ -76,4 +87,5 @@ public class ContainerButtons : MonoBehaviour {
 		return id;
 	}
 	*/
+
 }
