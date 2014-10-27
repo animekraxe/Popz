@@ -156,7 +156,7 @@ public class Creature : MonoBehaviour {
 			transform.position = new Vector3(xMin + 1, yMax - 1, 0);
 			moveTicker = moveWaitTime;
 		}
-		else if (transform.position.y >yMax) {
+		else if (transform.position.y > yMax) {
 			transform.position = new Vector3(transform.position.x, yMax - 1, 0);
 			moveTicker = moveWaitTime;
 		}
