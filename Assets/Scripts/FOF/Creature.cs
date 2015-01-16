@@ -26,12 +26,17 @@ public class Creature : MonoBehaviour {
 
 	private bool canBeSelected;
 
+	public LevelManager manager;
+	private bool endAnimationPlay;
+	public WayPoint endPoint;
+
 	// Use this for initialization
 	void Start () {
+		endAnimationPlay = false;
 		moveTicker = 0;
-		cloakTicker = uncloakWaitTime;
-		cloaked = true;
-		canBeSelected = true;
+		cloakTicker = -5;
+		cloaked = false;
+		canBeSelected = false;
 		direction = 1;
 
 		initMaterial = this.renderer.material;
@@ -49,16 +54,23 @@ public class Creature : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		moveTicker += Time.deltaTime;
-		cloakTicker += Time.deltaTime;
+		if (!endAnimationPlay) {
+			moveTicker += Time.deltaTime;
+			cloakTicker += Time.deltaTime;
 
-		moveUpdate();
-		changeTarget();
-		setCloak();
-		checkReveal();
-		Vector3 zeroZ = new Vector3(transform.position.x, transform.position.y, 0);
-		transform.position = zeroZ;
-		checkInBounds();
+			moveUpdate();
+			changeTarget();
+			setCloak();
+	//		checkReveal();
+			Vector3 zeroZ = new Vector3(transform.position.x, transform.position.y, 0);
+			transform.position = zeroZ;
+			checkInBounds();
+			checkEndState();
+		}
+		else {
+			target = endPoint.transform.position;
+			moveUpdate();
+		}
 	}
 
 	private void moveUpdate () {
@@ -116,14 +128,22 @@ public class Creature : MonoBehaviour {
 		}
 	}
 
-	public void checkReveal () {
-		if (Input.GetKey(KeyCode.Space)) {
+	public void reveal () {
+//		if (Input.GetKey(KeyCode.Space)) {
+			cloaked = false;
+			cloakTicker = 0;
+			canBeSelected = false;
+//		}
+	}
+/*
+	void OnGUI() {
+		if (GUI.Button(new Rect(10, Screen.height - 60, 50, 50), "Light")) {
 			cloaked = false;
 			cloakTicker = 0;
 			canBeSelected = false;
 		}
 	}
-
+*/
 	private void checkInBounds () {
 		float xMin = leftBound.transform.position.x;
 		float xMax = rightBound.transform.position.x;
@@ -136,9 +156,19 @@ public class Creature : MonoBehaviour {
 			transform.position = new Vector3(xMin + 1, yMax - 1, 0);
 			moveTicker = moveWaitTime;
 		}
-		else if (transform.position.y >yMax) {
+		else if (transform.position.y > yMax) {
 			transform.position = new Vector3(transform.position.x, yMax - 1, 0);
 			moveTicker = moveWaitTime;
+		}
+	}
+
+	private void checkEndState () {
+		if (!manager.getState()) {
+			leftBound.GetComponent<BoxCollider>().enabled = false;
+			canBeSelected = false;
+			endAnimationPlay = true;
+			speed = 60;
+			direction = 1;
 		}
 	}
 
