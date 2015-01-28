@@ -12,3 +12,6 @@ ProjectSettings/
 /*.userprefs
 /*.pidb
 /*.booproj
+
+# OS X generated files
+.DS_Store
