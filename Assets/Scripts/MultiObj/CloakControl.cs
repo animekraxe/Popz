@@ -6,10 +6,10 @@ public class CloakControl : MonoBehaviour {
 
 	// Reference to Player
 	//TODO: REPLACE WITH REFERENCE TO GAME MANAGER STATES
-	public Player player;
+	public MultiObjPlayer player;
 
 	// Distractor Parameters
-	public bool isDistractor = false;
+	public bool is_distractor = false;
 
 	// Cloak State Variables
 	private Material initMaterial;
@@ -17,6 +17,8 @@ public class CloakControl : MonoBehaviour {
 	private float revealTicker;
 
 	private List<Color> colorSet;
+	public AudioClip success;
+	public AudioClip fail;
 
 	// Use this for initialization
 	void Start () {
@@ -24,7 +26,7 @@ public class CloakControl : MonoBehaviour {
 		initMaterial = this.renderer.material;
 		revealMaterial = initMaterial;
 
-		if (!isDistractor) {
+		if (!is_distractor) {
 			initMaterial = this.renderer.material;
 			revealMaterial = new Material (initMaterial);
 			revealMaterial.color = Util.randomColorFromSet(colorSet);
@@ -35,9 +37,7 @@ public class CloakControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//if (!isDistractor) {
-			updateCloak();
-		//}
+		updateCloak();
 	}
 
 	private void updateCloak () {
@@ -66,11 +66,21 @@ public class CloakControl : MonoBehaviour {
 		colorSet = cset;
 	}
 
+	public bool isDistractor() {
+		return is_distractor;
+	}
+
 	void OnMouseDown () {
 		// Verify in radius
 		var selectionRadius = player.GetComponentInChildren<SphereCollider> ();
 		var radius = selectionRadius.gameObject.transform.localScale.x / 2.0f;
-		var dist = transform.position - selectionRadius.gameObject.transform.position;
+
+		var object2D = new Vector2 (transform.position.x, transform.position.y);
+		var player2D = new Vector2 (selectionRadius.transform.position.x,
+		                            selectionRadius.transform.position.y);
+
+		//var dist = transform.position - selectionRadius.gameObject.transform.position;
+		var dist = object2D - player2D;
 		Debug.Log ("Radius: " + radius);
 		Debug.Log ("Distance: " + dist.magnitude);
 
@@ -78,14 +88,17 @@ public class CloakControl : MonoBehaviour {
 			Debug.Log("Not in selection radius");
 			return;
 		}
+	}
 
+	public void validate () {
 		//TODO: MOVE SCORING AND VERIFICATION TO GAME MANAGER OR NEW SCRIPT
-		if (player.currentColor () == revealMaterial.color) {
-			player.AddToScore(100, !isDistractor);
+		var is_correct = player.currentColor () == revealMaterial.color;
+		if (is_correct) {
+			player.AddToScore(100, !isDistractor());
+			AudioSource.PlayClipAtPoint(success, this.transform.position);
 		} else {
-			Debug.Log ("WRONG");
-			player.AddToScore (-100, !isDistractor);
+			player.AddToScore (-100, !isDistractor());
+			AudioSource.PlayClipAtPoint(fail, this.transform.position);
 		}
-		gameObject.SetActive(false);
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Player : MonoBehaviour {
+public class MultiObjPlayer : MonoBehaviour {
 
 	public GameObject collector;
 
@@ -38,6 +38,7 @@ public class Player : MonoBehaviour {
 	void Update () {
 		updateBinSwitch ();
 		updateCollector ();
+		HandleInput ();
 	}
 
 	public void regenCollectors (int num) {
@@ -99,6 +100,12 @@ public class Player : MonoBehaviour {
 
 	public int GetScore () {
 		return score;
+	}
+
+	void HandleInput() {
+		if (Input.GetKeyDown(KeyCode.RightShift)) {
+			Selection.DoSelection();
+		}
 	}
 }
 

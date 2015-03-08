@@ -8,7 +8,7 @@ public class TerrainGenerator : MonoBehaviour {
 	private PlatformGenerator platformGen;
 	private CollectibleGenerator collectibleGen;
 	private GroundGenerator groundGen;
-
+	private NbackGenerator nbackGen;
 
 	// Use this for initialization
 	void Start () {
@@ -17,6 +17,7 @@ public class TerrainGenerator : MonoBehaviour {
 		platformGen = GameObject.FindGameObjectWithTag ("PlatformGen").GetComponent<PlatformGenerator> ();
 		collectibleGen = GameObject.FindGameObjectWithTag ("CollectibleGen").GetComponent<CollectibleGenerator> ();
 		groundGen = GameObject.FindGameObjectWithTag ("GroundGen").GetComponent<GroundGenerator> ();
+		nbackGen = FindObjectOfType (typeof(NbackGenerator)) as NbackGenerator;
 
 		// Position generator and box collider 
 		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
@@ -51,6 +52,6 @@ public class TerrainGenerator : MonoBehaviour {
 		platformGen.GeneratePlatforms (grid, tc);
 		collectibleGen.GenerateCollectibles (grid, tc);
 		groundGen.GenerateGrounds(grid, tc);
-
+		nbackGen.GenerateNbackInGrid (grid, tc);
 	}
 }

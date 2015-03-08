@@ -16,6 +16,7 @@ public class MultiObjGameManager : MonoBehaviour {
 
 	// Game State Variables
 	private bool gameRunning;
+	private float pushSpeed = 6.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -37,24 +38,26 @@ public class MultiObjGameManager : MonoBehaviour {
 		FieldInfo info = Util.getFieldInfo(field);
 		for (int i = 0; i < level + numDistractors; ++i) {
 			// Universal parameters for all creatures
-			var spawnPosition = new Vector3(Random.Range (info.lowerX + (info.width / 2.0f), info.upperX),
-			                                Random.Range (info.lowerY, info.upperY),
+			var spawnPosition = new Vector3(Random.Range (info.lowerX, info.upperX - (info.width / 2.0f)),
+			                                Random.Range (info.lowerY + 2, info.upperY),
 			                                0);
 			var creature = Instantiate(creaturePrefab) as GameObject;
 			creature.transform.position = spawnPosition;
 			creature.GetComponent<Movement>().field = field;
-			creature.GetComponent<CloakControl>().player = player.GetComponentInChildren<Player>();
+			creature.GetComponent<Movement>().pushSpeed = pushSpeed;
+			creature.GetComponent<CloakControl>().player = player.GetComponentInChildren<MultiObjPlayer>();
 			creature.GetComponent<CloakControl>().setColorSet(colorSet);
+			creature.GetComponent<Selection>().player = player.GetComponentInChildren<MultiObjPlayer>();
 
 			// Distractor parameters only
 			if (i >= level) {
-				creature.GetComponent<CloakControl>().isDistractor = true;
+				creature.GetComponent<CloakControl>().is_distractor = true;
 			}
 		}
 	}
 
 	void startPlayer () {
-		player.GetComponentInChildren<Player> ().setCollectors (colorSet);
+		player.GetComponentInChildren<MultiObjPlayer> ().setCollectors (colorSet);
 	}
 
 	void startLevel () {
@@ -78,12 +81,12 @@ public class MultiObjGameManager : MonoBehaviour {
 		for (int i = 0; i < creatures.Length; ++i)
 			Destroy (creatures [i].gameObject);
 
-		player.GetComponentInChildren<Player> ().numCloakedObtained = 0;
+		player.GetComponentInChildren<MultiObjPlayer> ().numCloakedObtained = 0;
 		
 	}
 
 	void checkGameEnd () {
-		var numCloakedObtained = player.GetComponentInChildren<Player> ().NumCloakedObtained ();
+		var numCloakedObtained = player.GetComponentInChildren<MultiObjPlayer> ().NumCloakedObtained ();
 		if (level == numCloakedObtained) {
 			gameRunning = false;
 			++stage;

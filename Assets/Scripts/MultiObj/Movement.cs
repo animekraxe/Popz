@@ -15,7 +15,9 @@ public class Movement : MonoBehaviour {
 
 	// Movement Parameters
 	public Vector3 target;
-	private float speed = 3;
+	public float pushSpeed = 0.0f;
+
+	private float speed = 3.0f;
 	private float moveTicker;
 	private float moveWaitTime = 2f;
 	private int direction;
@@ -41,6 +43,17 @@ public class Movement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		var bottomLeftCorner = Camera.main.ViewportToWorldPoint (new Vector3 (0, 0, 0));
+		var upperRightCorner = Camera.main.ViewportToWorldPoint (new Vector3 (0.5f, 1, 0));
+
+		topBound.transform.position = upperRightCorner;
+		bottomBound.transform.position = bottomLeftCorner;
+		leftBound.transform.position = bottomLeftCorner;
+		rightBound.transform.position = upperRightCorner;
+
+		// Gentle velocity forward
+		transform.position += new Vector3 (pushSpeed * Time.deltaTime, 0.0f, 0.0f);
+
 		if (!endAnimationPlay) {
 			// Update animations
 			moveTicker += Time.deltaTime;
@@ -92,18 +105,35 @@ public class Movement : MonoBehaviour {
 		float xMax = rightBound.transform.position.x;
 		float yMax = topBound.transform.position.y;
 		float yMin = bottomBound.transform.position.y;
-		
+
+		/*
 		if (transform.position.x < xMin || transform.position.x > xMax
 		    || transform.position.y < yMin) {
 			transform.position = new Vector3(xMin + 1, yMax - 1, 0);
+			moveTicker = moveWaitTime;
+			changeTarget();
 			direction *= -1;
-			moveTicker = 0;
+			//moveTicker = 0;
 		}
+		*/
+
+		// Turn around before you hit the walls
+		if (transform.position.x < xMin + 1 || transform.position.x > xMax - 1
+		    || transform.position.y < yMin + 2 || transform.position.y > yMax - 1) {
+			//transform.position = new Vector3(xMin + 1, yMax - 1, 0);
+			moveTicker = moveWaitTime;
+			changeTarget();
+			transform.LookAt(target);
+			//direction *= -1;
+			//moveTicker = 0;
+		}
+
 		else if (transform.position.y > yMax) {
 			transform.position = new Vector3(transform.position.x, yMax - 1, 0);
 			direction *= -1;
 			moveTicker = 0;
 		}
+
 	}
 
 	void OnCollisionEnter(Collision collision) {

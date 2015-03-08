@@ -52,7 +52,10 @@ public class Util : MonoBehaviour {
 	}
 
 	static public FieldInfo getFieldInfo (GameObject field) {
+		/*
 		FieldInfo ret;
+
+
 		var fieldRenderer = field.GetComponentInChildren<Renderer> ();
 		ret.width = fieldRenderer.bounds.size.x;
 		ret.height = fieldRenderer.bounds.size.y;
@@ -61,6 +64,37 @@ public class Util : MonoBehaviour {
 		ret.lowerY = field.transform.position.y;
 		ret.upperX = ret.lowerX + ret.width;
 		ret.upperY = ret.lowerY + ret.height;
+		*/
+
+		FieldInfo ret;
+
+		var bottomLeftCorner = Camera.main.ViewportToWorldPoint (new Vector3 (0, 0, 0));
+		var upperRightCorner = Camera.main.ViewportToWorldPoint (new Vector3 (0.5f, 1, 0));
+
+		ret.lowerX = bottomLeftCorner.x;
+		ret.lowerY = bottomLeftCorner.y;
+		ret.upperX = upperRightCorner.x;
+		ret.upperY = upperRightCorner.y;
+
+		ret.width = ret.upperX - ret.lowerX;
+		ret.height = ret.upperY - ret.lowerY;
+
 		return ret;
+	}
+
+	static public float getDistance2D (GameObject x, GameObject y) {
+		var x2D = new Vector2 (x.transform.position.x, x.transform.position.y);
+		var y2D = new Vector2 (y.transform.position.x, y.transform.position.y);
+		return (x2D - y2D).magnitude;
+	}
+
+	static public bool checkNbackMatch (List<Color> sequence, int n) {
+		if (n >= sequence.Count) {
+			return false;
+		}
+		if (sequence[sequence.Count - n - 1] == sequence[sequence.Count - 1]) {
+			return true;
+		}
+		return false;
 	}
 }

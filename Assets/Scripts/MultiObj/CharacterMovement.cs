@@ -4,6 +4,7 @@ using System.Collections;
 public class CharacterMovement : MonoBehaviour {
 
 	public float speed = 10.0f;
+	public bool canJump;
 
 	private Transform initial;
 
@@ -35,7 +36,7 @@ public class CharacterMovement : MonoBehaviour {
 	}
 
 	void updatePhysics () {
-		if (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.Space)) {
+		if (canJump && (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.Space))) {
 			rigidbody.AddForce(new Vector3(0, 45, 0), ForceMode.Impulse);
 		}
 		if (Input.GetKey (KeyCode.S)) {

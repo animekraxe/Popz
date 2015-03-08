@@ -17,8 +17,7 @@ public class GroundGenerator : MonoBehaviour {
 			groundPiece.localScale = new Vector3(grid.cellSizeX, grid.cellSizeY, 1f);
 		}
 	}
-
-	// Update is called once per frame
+	
 	public void GenerateGrounds (Grid grid, TerrainChunk tc) {
 		for (int x = 0; x < grid.numCellsX; x++) {
 			if (Random.value < pitSpawnChance && !previousHasPit) {
