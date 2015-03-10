@@ -9,7 +9,6 @@ public class GroundGenerator : MonoBehaviour {
 
 	private bool previousHasPit = false;
 
-
 	// Use this for initialization
 	void Start () {
 		Grid grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();

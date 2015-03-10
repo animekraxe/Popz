@@ -10,8 +10,13 @@ public class TerrainGenerator : MonoBehaviour {
 	private GroundGenerator groundGen;
 	private NbackGenerator nbackGen;
 
+	// Used to determine current game modes
+	private PopzGameManager gameMngr;
+
 	// Use this for initialization
 	void Start () {
+		gameMngr = FindObjectOfType (typeof(PopzGameManager)) as PopzGameManager;
+
 		// Set up references to object generators and grid
 		grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
 		platformGen = GameObject.FindGameObjectWithTag ("PlatformGen").GetComponent<PlatformGenerator> ();
@@ -47,11 +52,20 @@ public class TerrainGenerator : MonoBehaviour {
 
 	void GenerateTerrain (Vector3 spawnPos) {
 		TerrainChunk tc = GameObject.Instantiate (terrainChunk, spawnPos, Quaternion.identity) as TerrainChunk;
-		//tc.transform.parent = this.transform;
 		grid.ClearGrid ();
-		platformGen.GeneratePlatforms (grid, tc);
-		collectibleGen.GenerateCollectibles (grid, tc);
+
+		// Generate ground
 		groundGen.GenerateGrounds(grid, tc);
-		nbackGen.GenerateNbackInGrid (grid, tc);
+
+		// Generate For Pattern
+		if (gameMngr.Modes ().Contains (GameModes.Pattern)) {
+			platformGen.GeneratePlatforms (grid, tc);
+			collectibleGen.GenerateCollectibles (grid, tc);
+		}
+
+		// Generate For Nback
+		if (gameMngr.Modes ().Contains (GameModes.Nback)) {
+			nbackGen.GenerateNbackInGrid (grid, tc);
+		}
 	}
 }

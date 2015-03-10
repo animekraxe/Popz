@@ -15,22 +15,17 @@ public class MultiObjGameManager : MonoBehaviour {
 	private List<Color> colorSet;
 
 	// Game State Variables
-	private bool gameRunning;
-	private float pushSpeed = 6.0f;
+	private bool gameRunning = false;
+	public float pushSpeed = 6.0f;
 
 	// Use this for initialization
 	void Start () {
-		startLevel ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (gameRunning) {
 			checkGameEnd ();
-		} else {
-			//Debug.Log ("GAME OVER");
-			cleanupLevel();
-			startLevel ();
 		}
 	}
 
@@ -60,7 +55,7 @@ public class MultiObjGameManager : MonoBehaviour {
 		player.GetComponentInChildren<MultiObjPlayer> ().setCollectors (colorSet);
 	}
 
-	void startLevel () {
+	public void startLevel () {
 		if (stage > level) {
 			++level;
 			stage = 1;
@@ -77,19 +72,23 @@ public class MultiObjGameManager : MonoBehaviour {
 	}
 
 	void cleanupLevel () {
+		gameRunning = false;
 		var creatures = FindObjectsOfType<CloakControl> ();
 		for (int i = 0; i < creatures.Length; ++i)
 			Destroy (creatures [i].gameObject);
-
 		player.GetComponentInChildren<MultiObjPlayer> ().numCloakedObtained = 0;
-		
+	}
+
+	void restartLevel() {
+		++stage;
+		startLevel ();
 	}
 
 	void checkGameEnd () {
 		var numCloakedObtained = player.GetComponentInChildren<MultiObjPlayer> ().NumCloakedObtained ();
 		if (level == numCloakedObtained) {
-			gameRunning = false;
-			++stage;
+			cleanupLevel();
+			restartLevel();
 		}
 	}
 }

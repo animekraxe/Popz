@@ -31,6 +31,7 @@ public class Player : MonoBehaviour {
 		if (canRun) {
 			transform.Translate(new Vector3(runningSpeed * Time.deltaTime, 0f, 0f));
 		}
+		UpdateTouch ();
 	}
 
 	void OnCollisionStay2D (Collision2D col) {
@@ -70,4 +71,22 @@ public class Player : MonoBehaviour {
 	}
 
 	public bool IsRunning { get { return canRun; } } 
+
+	void UpdateTouch () {
+		foreach (Touch touch in Input.touches) {
+			if (touch.phase == TouchPhase.Began) {
+				Ray ray = Camera.main.ScreenPointToRay (touch.position);
+				RaycastHit hit;
+				if (Physics.Raycast(ray, out hit)) {
+					if (hit.collider.tag == "Player") {
+						hit.collider.gameObject.rigidbody2D.velocity += new Vector2(0, jumpingSpeed);
+					}
+				}
+			}
+		}
+	}
+
+	void OnSwipeUp () {
+		rigidbody2D.velocity += new Vector2(0, jumpingSpeed);
+	}
 }

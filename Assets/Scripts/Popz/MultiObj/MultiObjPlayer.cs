@@ -11,6 +11,9 @@ public class MultiObjPlayer : MonoBehaviour {
 	private int score;
 	public int numCloakedObtained;
 
+	// For Input States
+	Vector2 initTouchPos;
+
 	// Player has this collector - Bool or Int? Can have multiple?
 	// TODO: DECIDE IF BIN SYSTEM OR JUST USE COLORS
 	private Bin rBin = new Bin();
@@ -77,6 +80,10 @@ public class MultiObjPlayer : MonoBehaviour {
 	}
 
 	void updateCollector () {
+		if (collectionBins.Count == 0) {
+			return;
+		}
+
 		var renderer = collector.GetComponentInChildren<Renderer> ();
 		renderer.material.color = collectionBins[0].color;
 	}
@@ -106,17 +113,23 @@ public class MultiObjPlayer : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.RightShift)) {
 			Selection.DoSelection();
 		}
+
+		foreach (Touch touch in Input.touches) {
+			if (touch.tapCount == 2 && touch.phase == TouchPhase.Ended) {
+				Selection.DoSelection();
+			}
+		}
+	}
+
+	void OnSwipeLeft () {
+		Debug.Log("Swipe Left");
+		collectionBins.Add (collectionBins[0]);
+		collectionBins.RemoveAt (0);
+	}
+
+	void OnSwipeRight () {
+		Debug.Log ("Swipe Right");
+		collectionBins.Insert(0, collectionBins[collectionBins.Count - 1]);
+		collectionBins.RemoveAt(collectionBins.Count - 1);
 	}
 }
-
-//			Debug.Log ("Bin Order: ");
-//			for (int i = 0; i < collectionBins.Count; ++i) {
-//				var name = "";
-//				var color = collectionBins[i].color;
-//				if (color == Color.red) name = "red";
-//				else if (color == Color.blue) name = "blue";
-//				else if (color == Color.green) name = "green";
-//				else if (color == Color.magenta) name = "magenta";
-//				else if (color == Color.yellow) name = "yellow";
-//				Debug.Log (i + ". " + name);
-//			}
