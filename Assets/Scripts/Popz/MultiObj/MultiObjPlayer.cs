@@ -114,11 +114,11 @@ public class MultiObjPlayer : MonoBehaviour {
 			Selection.DoSelection();
 		}
 
-		foreach (Touch touch in Input.touches) {
-			if (touch.tapCount == 2 && touch.phase == TouchPhase.Ended) {
-				Selection.DoSelection();
-			}
-		}
+//		foreach (Touch touch in Input.touches) {
+//			if (touch.tapCount == 2 && touch.phase == TouchPhase.Ended) {
+//				Selection.DoSelection();
+//			}
+//		}
 	}
 
 	void OnSwipeLeft () {
@@ -131,5 +131,9 @@ public class MultiObjPlayer : MonoBehaviour {
 		Debug.Log ("Swipe Right");
 		collectionBins.Insert(0, collectionBins[collectionBins.Count - 1]);
 		collectionBins.RemoveAt(collectionBins.Count - 1);
+	}
+
+	void OnSwipeDown () {
+		Selection.DoSelection();
 	}
 }
