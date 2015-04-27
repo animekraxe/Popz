@@ -40,9 +40,9 @@ public class Selection : MonoBehaviour {
 			return;
 		}
 		if (this.gameObject == Selection.closestObj) {
-			renderer.material.color = Color.cyan;
+			GetComponent<Renderer>().material.color = Color.cyan;
 		} else {
-			renderer.material.color = Color.black;
+			GetComponent<Renderer>().material.color = Color.black;
 		}
 	}
 

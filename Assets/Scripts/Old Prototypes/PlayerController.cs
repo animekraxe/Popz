@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 		boostAnimTimer = 0.0f;
 
 		// restrict the character from moving in the z-direction
-		rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
+		GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionZ;
 	}
 	
 	void Update () {
@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate() {
 	
 		// when the rigidbody is kinematic, it won't move, so exit FixedUpdate()
-		if( rigidbody.isKinematic ) return;
+		if( GetComponent<Rigidbody>().isKinematic ) return;
 
 		// otherwise, perform movements if input was given
 		if( boostMod ) {
@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviour {
 			}
 
 			if( isJumping ) {
-				rigidbody.velocity += new Vector3(0, jumpVel, 0);
+				GetComponent<Rigidbody>().velocity += new Vector3(0, jumpVel, 0);
 			}
 		}
 	}
@@ -104,24 +104,24 @@ public class PlayerController : MonoBehaviour {
 	void moveRight() {
 		switch(camRotCtrl.view) {	// movement is determined by the current view
 			case CameraRotationController.VIEW.FRONT:
-				rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;	// lock z-movement
-				if( rigidbody.velocity.x >= walkMax ) return;
-				rigidbody.velocity += new Vector3(walkVel, 0, 0);	// move in +x-direction
+				GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionZ;	// lock z-movement
+				if( GetComponent<Rigidbody>().velocity.x >= walkMax ) return;
+				GetComponent<Rigidbody>().velocity += new Vector3(walkVel, 0, 0);	// move in +x-direction
 				break;
 			case CameraRotationController.VIEW.RIGHT:
-				rigidbody.constraints = RigidbodyConstraints.FreezePositionX;	// lock x-movement
-				if( rigidbody.velocity.z >= walkMax ) return;
-				rigidbody.velocity += new Vector3(0, 0, walkVel);	// move in +z-direction
+				GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX;	// lock x-movement
+				if( GetComponent<Rigidbody>().velocity.z >= walkMax ) return;
+				GetComponent<Rigidbody>().velocity += new Vector3(0, 0, walkVel);	// move in +z-direction
 				break;
 			case CameraRotationController.VIEW.BACK:
-				rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;	// lock z-movement
-				if( rigidbody.velocity.x <= -walkMax ) return;
-				rigidbody.velocity += new Vector3(-walkVel, 0, 0);	// move in -x-direction
+				GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionZ;	// lock z-movement
+				if( GetComponent<Rigidbody>().velocity.x <= -walkMax ) return;
+				GetComponent<Rigidbody>().velocity += new Vector3(-walkVel, 0, 0);	// move in -x-direction
 				break;
 			case CameraRotationController.VIEW.LEFT:
-				rigidbody.constraints = RigidbodyConstraints.FreezePositionX;	// lock x-movement
-				if( rigidbody.velocity.z <= -walkMax ) return;
-				rigidbody.velocity += new Vector3(0, 0, -walkVel);	// move in -z-direction
+				GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX;	// lock x-movement
+				if( GetComponent<Rigidbody>().velocity.z <= -walkMax ) return;
+				GetComponent<Rigidbody>().velocity += new Vector3(0, 0, -walkVel);	// move in -z-direction
 				break;
 		}
 	}
@@ -129,24 +129,24 @@ public class PlayerController : MonoBehaviour {
 	void moveLeft() {	// same as moveRight() just in the opposite direction
 		switch(camRotCtrl.view) {
 		case CameraRotationController.VIEW.FRONT:
-			rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
-			if( rigidbody.velocity.x <= -walkMax ) return;
-			rigidbody.velocity += new Vector3(-walkVel, 0, 0);
+			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionZ;
+			if( GetComponent<Rigidbody>().velocity.x <= -walkMax ) return;
+			GetComponent<Rigidbody>().velocity += new Vector3(-walkVel, 0, 0);
 			break;
 		case CameraRotationController.VIEW.RIGHT:
-			rigidbody.constraints = RigidbodyConstraints.FreezePositionX;
-			if( rigidbody.velocity.z <= -walkMax ) return;
-			rigidbody.velocity += new Vector3(0, 0, -walkVel);
+			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX;
+			if( GetComponent<Rigidbody>().velocity.z <= -walkMax ) return;
+			GetComponent<Rigidbody>().velocity += new Vector3(0, 0, -walkVel);
 			break;
 		case CameraRotationController.VIEW.BACK:
-			rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
-			if( rigidbody.velocity.x >= walkMax ) return;
-			rigidbody.velocity += new Vector3(walkVel, 0, 0);
+			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionZ;
+			if( GetComponent<Rigidbody>().velocity.x >= walkMax ) return;
+			GetComponent<Rigidbody>().velocity += new Vector3(walkVel, 0, 0);
 			break;
 		case CameraRotationController.VIEW.LEFT:
-			rigidbody.constraints = RigidbodyConstraints.FreezePositionX;
-			if( rigidbody.velocity.z >= walkMax ) return;
-			rigidbody.velocity += new Vector3(0, 0, walkVel);
+			GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX;
+			if( GetComponent<Rigidbody>().velocity.z >= walkMax ) return;
+			GetComponent<Rigidbody>().velocity += new Vector3(0, 0, walkVel);
 			break;
 		}
 	}

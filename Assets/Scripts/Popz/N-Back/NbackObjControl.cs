@@ -10,10 +10,12 @@ public class NbackObjControl : MonoBehaviour {
 	public AudioClip success;
 	public AudioClip fail;
 
+	static NbackObjControl currentRevealed = null;
+
 	// Use this for initialization
 	void Start () {
 		player = GameObject.FindGameObjectWithTag ("Player").GetComponent<Player> ();
-		renderer.material.color = Color.black;
+		GetComponent<Renderer>().material.color = Color.black;
 	}
 	
 	// Update is called once per frame
@@ -37,8 +39,24 @@ public class NbackObjControl : MonoBehaviour {
 		var diameter = radius * 2; // As soon as last object has passed sphere, new object will reveal.
 		
 		if (Util.getDistance2D (sphereCollider.gameObject, this.gameObject) < diameter) {
-			renderer.material.color = revealColor;
+			UpdateCurrentRevealed(this);
 		}
+	}
+
+	void Reveal() {
+		GetComponent<Renderer>().material.color = revealColor;
+	}
+
+	void Cloak() {
+		GetComponent<Renderer>().material.color = Color.black;
+	}
+
+	static void UpdateCurrentRevealed(NbackObjControl next) {
+		if (currentRevealed) {
+			currentRevealed.Cloak ();	
+		}
+		currentRevealed = next;
+		next.Reveal ();
 	}
 
 	public void MarkCorrect() {

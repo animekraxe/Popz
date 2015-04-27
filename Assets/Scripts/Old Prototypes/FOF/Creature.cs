@@ -39,7 +39,7 @@ public class Creature : MonoBehaviour {
 		canBeSelected = false;
 		direction = 1;
 
-		initMaterial = this.renderer.material;
+		initMaterial = this.GetComponent<Renderer>().material;
 		initMesh = this.GetComponent<MeshFilter>().mesh;
 
 		target = transform.position;
@@ -93,11 +93,11 @@ public class Creature : MonoBehaviour {
 
 		if (cloaked) {
 			this.GetComponent<MeshFilter>().mesh = cloakObjectRef.GetComponent<MeshFilter>().mesh;
-			renderer.material = cloakObjectRef.renderer.material;
+			GetComponent<Renderer>().material = cloakObjectRef.GetComponent<Renderer>().material;
 		}
 		else {
 			this.GetComponent<MeshFilter>().mesh = initMesh;
-			renderer.material = initMaterial;
+			GetComponent<Renderer>().material = initMaterial;
 		}
 	}
 

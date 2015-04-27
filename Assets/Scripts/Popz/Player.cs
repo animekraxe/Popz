@@ -9,6 +9,10 @@ public class Player : MonoBehaviour {
 
 	public bool canRun = true;
 	public bool canJump = true;
+
+	// For testing purposes
+	public bool canDoubleJump = true;
+
 	private float screenBottom;
 	private PatternLevelManager levelManager;
 	// Use this for initialization
@@ -26,7 +30,7 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (jumpEnabled && canJump && Input.GetKeyDown ("space")){
-			rigidbody2D.velocity += new Vector2(0, jumpingSpeed);
+			Jump ();
 		}
 		if (canRun) {
 			transform.Translate(new Vector3(runningSpeed * Time.deltaTime, 0f, 0f));
@@ -56,7 +60,9 @@ public class Player : MonoBehaviour {
 	
 	void OnCollisionExit2D (Collision2D col) {
 		if (col.gameObject.tag.Equals ("Ground")) {
-			canJump = false;
+			if (!canDoubleJump) {
+				canJump = false;
+			}
 		}
 		else if (col.gameObject.tag.Equals("Hill")) {
 			foreach (ContactPoint2D cp in col.contacts) {
@@ -75,18 +81,19 @@ public class Player : MonoBehaviour {
 	void UpdateTouch () {
 		foreach (Touch touch in Input.touches) {
 			if (touch.phase == TouchPhase.Began) {
-				Ray ray = Camera.main.ScreenPointToRay (touch.position);
-				RaycastHit hit;
-				if (Physics.Raycast(ray, out hit)) {
-					if (hit.collider.tag == "Player") {
-						hit.collider.gameObject.rigidbody2D.velocity += new Vector2(0, jumpingSpeed);
-					}
-				}
+				Jump ();
 			}
 		}
 	}
 
+	void Jump () {
+		//rigidbody2D.velocity += new Vector2(0, jumpingSpeed);
+		if (GetComponent<Rigidbody2D>().velocity.y <= 0) {
+			GetComponent<Rigidbody2D>().AddForce (Vector2.up * jumpingSpeed);
+		}
+	}
+
 	void OnSwipeUp () {
-		rigidbody2D.velocity += new Vector2(0, jumpingSpeed);
+		Jump ();
 	}
 }

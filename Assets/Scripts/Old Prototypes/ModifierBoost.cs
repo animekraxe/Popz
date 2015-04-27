@@ -16,11 +16,11 @@ public class ModifierBoost : Modifier {
 			switch(camRotCtrl.view) {
 				case CameraRotationController.VIEW.FRONT:
 				case CameraRotationController.VIEW.BACK:
-					plyr.rigidbody.velocity = new Vector3(boostVel, 0, 0);
+					plyr.GetComponent<Rigidbody>().velocity = new Vector3(boostVel, 0, 0);
 					break;
 				case CameraRotationController.VIEW.RIGHT:
 				case CameraRotationController.VIEW.LEFT:
-					plyr.rigidbody.velocity = new Vector3(0, 0, -boostVel);
+					plyr.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, -boostVel);
 					break;
 			}
 		}

@@ -10,7 +10,7 @@ public class CharacterMovement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		rigidbody.freezeRotation = true;
+		GetComponent<Rigidbody>().freezeRotation = true;
 	}
 	
 	// Update is called once per frame
@@ -21,7 +21,7 @@ public class CharacterMovement : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		rigidbody.AddForce (3 * Physics.gravity);
+		GetComponent<Rigidbody>().AddForce (3 * Physics.gravity);
 		updatePhysics ();
 	}
 
@@ -37,7 +37,7 @@ public class CharacterMovement : MonoBehaviour {
 
 	void updatePhysics () {
 		if (canJump && (Input.GetKeyDown (KeyCode.W) || Input.GetKeyDown (KeyCode.Space))) {
-			rigidbody.AddForce(new Vector3(0, 45, 0), ForceMode.Impulse);
+			GetComponent<Rigidbody>().AddForce(new Vector3(0, 45, 0), ForceMode.Impulse);
 		}
 		if (Input.GetKey (KeyCode.S)) {
 		}

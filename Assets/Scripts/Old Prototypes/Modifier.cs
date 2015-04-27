@@ -26,7 +26,7 @@ public class Modifier : MonoBehaviour {
 		
 		camRotCtrl = GameObject.FindGameObjectWithTag("SpinController").GetComponent<CameraRotationController>();
 		
-		ps = this.gameObject.particleSystem;
+		ps = this.gameObject.GetComponent<ParticleSystem>();
 		
 		modCube = this.transform.parent.FindChild("ModifierCube");
 		

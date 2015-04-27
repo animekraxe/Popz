@@ -15,6 +15,6 @@ public class BackgroundScroller : MonoBehaviour {
 		else if (position > 1f) {
 			position -= 1f;
 		}
-		renderer.material.mainTextureOffset = new Vector2 (position, 0);
+		GetComponent<Renderer>().material.mainTextureOffset = new Vector2 (position, 0);
 	}
 }

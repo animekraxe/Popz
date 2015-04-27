@@ -23,7 +23,6 @@ public class PatternLevelManager : MonoBehaviour {
 
 		roundsPerCollection = numRounds;
 		livesPerCollection = numLives;
-		pattern.GeneratePattern(patternLength);
 	}
 	
 	// Update is called once per frame

@@ -22,10 +22,11 @@ public class NbackGenerator : MonoBehaviour {
 	
 	}
 	
-	public void GenerateNbackInGrid(Grid grid, TerrainChunk tc) {
+	public void GenerateNbackInGrid(Grid grid, TerrainChunk tc, GroundGenerator ggen) {
 		int x = lastGridOffset;
 		for ( ; x < grid.numCellsX; x += rate) {
 			Transform h = GenerateNbackObjectInGrid(x, 1, grid, tc);
+			ggen.GenerateGround (x, 0, grid, tc);
 		}
 		lastGridOffset = x - grid.numCellsX;
 	}

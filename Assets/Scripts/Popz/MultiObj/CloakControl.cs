@@ -22,12 +22,12 @@ public class CloakControl : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		this.renderer.material.color = Color.black;
-		initMaterial = this.renderer.material;
+		this.GetComponent<Renderer>().material.color = Color.black;
+		initMaterial = this.GetComponent<Renderer>().material;
 		revealMaterial = initMaterial;
 
 		if (!is_distractor) {
-			initMaterial = this.renderer.material;
+			initMaterial = this.GetComponent<Renderer>().material;
 			revealMaterial = new Material (initMaterial);
 			revealMaterial.color = Util.randomColorFromSet(colorSet);
 		}
@@ -43,10 +43,10 @@ public class CloakControl : MonoBehaviour {
 	private void updateCloak () {
 		if (revealTicker > 0) {
 			revealTicker -= Time.deltaTime;
-			renderer.material = revealMaterial;
+			GetComponent<Renderer>().material = revealMaterial;
 		}
 		else {
-			renderer.material = initMaterial;
+			GetComponent<Renderer>().material = initMaterial;
 		}
 	}
 

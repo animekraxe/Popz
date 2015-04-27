@@ -32,14 +32,14 @@ public class TerrainGenerator : MonoBehaviour {
 		float boxHeight = topRight.y - bottomLeft.y;
 		float boxWidth = 1f;
 		boxCol.size = new Vector2 (boxWidth, boxHeight);
-		boxCol.center = new Vector2 (-boxWidth, boxHeight / 2f);
+		boxCol.offset = new Vector2 (-boxWidth, boxHeight / 2f);
 		transform.position = new Vector3(bottomLeft.x, bottomLeft.y, 0f);
 
 		BoxCollider2D chunkBoxCol = terrainChunk.GetComponent<BoxCollider2D> ();
 		float chunkBoxWidth = 2f * ((float) grid.numCellsX) * grid.cellSizeX;
 		float chunkBoxHeight = topRight.y - bottomLeft.y;
 		chunkBoxCol.size = new Vector2 (chunkBoxWidth, chunkBoxHeight);
-		chunkBoxCol.center = new Vector2 (chunkBoxWidth/2f, chunkBoxHeight/2f);
+		chunkBoxCol.offset = new Vector2 (chunkBoxWidth/2f, chunkBoxHeight/2f);
 		chunkBoxCol.isTrigger = true;
 
 		GenerateTerrain (transform.position);
@@ -55,7 +55,9 @@ public class TerrainGenerator : MonoBehaviour {
 		grid.ClearGrid ();
 
 		// Generate ground
-		groundGen.GenerateGrounds(grid, tc);
+		// Experimental: Generate ground or pitfalls based on Nback (See Generate For Nback)
+		// groundGen.GenerateGrounds(grid, tc); 
+
 
 		// Generate For Pattern
 		if (gameMngr.Modes ().Contains (GameModes.Pattern)) {
@@ -64,8 +66,10 @@ public class TerrainGenerator : MonoBehaviour {
 		}
 
 		// Generate For Nback
-		if (gameMngr.Modes ().Contains (GameModes.Nback)) {
-			nbackGen.GenerateNbackInGrid (grid, tc);
+		if (gameMngr.Modes ().Contains (GameModes.Nback) && gameMngr.Modes ().Count == 1) {
+			nbackGen.GenerateNbackInGrid (grid, tc, groundGen);
+		} else {
+			groundGen.GenerateGrounds (grid, tc);
 		}
 	}
 }

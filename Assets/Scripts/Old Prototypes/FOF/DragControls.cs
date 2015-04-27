@@ -35,6 +35,6 @@ public class DragControls : MonoBehaviour {
 	
 	void OnMouseUp()
 	{
-		Screen.showCursor = true;
+		Cursor.visible = true;
 	}
 }

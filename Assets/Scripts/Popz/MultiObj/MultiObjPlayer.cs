@@ -114,7 +114,7 @@ public class MultiObjPlayer : MonoBehaviour {
 			Selection.DoSelection();
 		}
 
-//		foreach (Touch touch in Input.touches) {
+//	    foreach (Touch touch in Input.touches) {
 //			if (touch.tapCount == 2 && touch.phase == TouchPhase.Ended) {
 //				Selection.DoSelection();
 //			}

@@ -13,20 +13,28 @@ public class Pattern : MonoBehaviour {
 	private bool hid = true;
 	private Player player;
 
+
+	private List<Collectible> collectionSet;
+	private List<Collectible> correctPattern;
+
 	public Collectible current { 
-		get { return pattern.Peek (); }  
+		//get { return pattern.Peek (); }  
+		get { return correctPattern[0]; }
 	}
 
 	public int patternCount {
-		get { return pattern.Count; }
+		//get { return pattern.Count; }
+		get { return correctPattern.Count; }
 	}
 
 	public int length {
-		get { return pattern.Count + foundPattern.Count; }
+		//get { return pattern.Count + foundPattern.Count; }
+		get { return pattern.Count; }
 	}
 
-	private CollectibleGenerator collectibleGen;
-	public Vector3 offset;
+	private CollectibleGenerator collectibleGen; 
+	private Vector3 offset;
+	private Vector3 offsetY;
 
 	void Awake () {
 		Grid grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
@@ -35,7 +43,11 @@ public class Pattern : MonoBehaviour {
 		pattern = new Queue<Collectible> ();
 		foundPattern = new Queue<Collectible> ();
 		highlight = GameObject.FindGameObjectWithTag ("Highlight").transform;
-		highlight.renderer.material.color = Color.grey;
+		highlight.GetComponent<Renderer>().material.color = Color.grey;
+
+		// Testing new matching mechanisms
+		collectionSet = new List<Collectible> ();
+		correctPattern = new List<Collectible> ();
 	}
 
 	void Start () {
@@ -44,7 +56,6 @@ public class Pattern : MonoBehaviour {
 		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
 		bottomLeft.y = Camera.main.GetComponent<FixedHeight> ().height - (topRight.y - bottomLeft.y)/2f;
 		transform.position = bottomLeft + grid.GridToWorld (0, 0);
-
 	}
 
 	void Update () {
@@ -64,25 +75,35 @@ public class Pattern : MonoBehaviour {
 			currentHighlighted = pattern.Peek ();
 			highlight.position = currentHighlighted.transform.position;
 		}
-		highlight.renderer.enabled = true;
+
+		//Testing new matching
+		highlight.GetComponent<Renderer>().enabled = false;
+		//highlight.renderer.enabled = true;
+
+
 		foreach (var c in pattern) {
-			c.gameObject.renderer.enabled = true;
+			c.gameObject.GetComponent<Renderer>().enabled = true;
 		}
 		foreach (var c in foundPattern) {
-			c.gameObject.renderer.enabled = true;
+			c.gameObject.GetComponent<Renderer>().enabled = true;
 		}
 
 	}
 
 	// Hides the pattern from the player
 	private void HidePattern () {
+		// Testing new matching
+		foreach (var c in collectionSet) {
+			c.gameObject.GetComponent<Renderer>().enabled = false;
+		}
+
 		hid = true;
-		highlight.renderer.enabled = false;
+		highlight.GetComponent<Renderer>().enabled = false;
 		foreach (var c in pattern) {
-			c.gameObject.renderer.enabled = false;
+			c.gameObject.GetComponent<Renderer>().enabled = false;
 		}
 		foreach (var c in foundPattern) {
-			c.gameObject.renderer.enabled = false;
+			c.gameObject.GetComponent<Renderer>().enabled = false;
 		}
 	}
 
@@ -100,6 +121,12 @@ public class Pattern : MonoBehaviour {
 			display = false;
 		}
 
+		// Testing new matching
+		foreach (var c in correctPattern) {
+			Destroy (c.gameObject);
+		}
+		correctPattern.Clear ();
+
 		foreach (var c in pattern) {
 			Destroy(c.gameObject);
 		}
@@ -116,8 +143,11 @@ public class Pattern : MonoBehaviour {
 
 	// Called when the player clicks the correct collectible
 	public void foundCollectible () {
-		Collectible c = pattern.Dequeue ();
-		foundPattern.Enqueue (c);
+		//Testing new matching
+		correctPattern.RemoveAt (0);
+
+		//Collectible c = pattern.Dequeue ();
+		//foundPattern.Enqueue (c);
 	}
 
 	// Creates a nonselectable collectible of the specified type and at the specified position
@@ -128,15 +158,25 @@ public class Pattern : MonoBehaviour {
 		col.selectable = false;
 		col.gameObject.layer = 9;
 		col.type = type;
-		col.gameObject.renderer.enabled = false;
+		col.gameObject.GetComponent<Renderer>().enabled = false;
 		return col;
 	}
-	
+
+	private int collectionType = -1;
+
 	private int previous = -1;
 	// Creates a pattern of the specified lengthz
 	public void GeneratePattern (int length) {
 		DestroyPattern ();
-		Vector3 startPos = transform.position;
+
+		// Generate forward/backward matching activity
+		ChooseRandomCollectionMethod ();
+
+		// This sets startPos to corner or center...
+		//Vector3 startPos = transform.position;
+
+		Vector3 startPos = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 2, 0));
+		Debug.Log ("Start Pos: " + startPos);
 		for (int i = 0; i < length; i++) {
 			int randNum = Random.Range (0, collectibleGen.collectibles.Length);
 			for (int j = 0; j < resistance; j++) {
@@ -152,8 +192,36 @@ public class Pattern : MonoBehaviour {
 			pattern.Enqueue(CreatePatternCollectible(randNum, startPos));
 			startPos = startPos + offset;
 		}
+
+		// Testing new matching
+		foreach (var c in pattern) {
+			if (collectionType == 0) {
+				correctPattern.Add (c);
+			} else if (collectionType == 1) {
+				correctPattern.Insert (0, c);
+			}
+		}
+
 		RevealPattern ();
 	}
 
+	void ChooseRandomCollectionMethod () {
+		collectionType = Random.Range (0, 2);
+	}
 
+	void OnGUI () {
+		string displayString = "";
+		if (collectionType == 0) {
+			displayString = "Forward";
+		} else if (collectionType == 1) {
+			displayString = "Backward";
+		}
+
+		// Displays pattern when a hint is used or when a new pattern has just been generated
+		if (display) {
+			GUI.Button(new Rect(Camera.main.pixelWidth / 2 - 50, Camera.main.pixelHeight / 2 - 50, 100, 30), displayString);
+		}
+		else if (!hid) {
+		}
+	}
 }

@@ -62,23 +62,23 @@ public class SpawnCreatures : MonoBehaviour {
 		switch (selection)
 		{
 			case 0:
-				clone.renderer.material.color = Color.red;
+				clone.GetComponent<Renderer>().material.color = Color.red;
 				cc = "r";
 				break;
 			case 1:
-				clone.renderer.material.color = Color.yellow;
+				clone.GetComponent<Renderer>().material.color = Color.yellow;
 				cc = "y";
 				break;
 			case 2:
-				clone.renderer.material.color = Color.green;
+				clone.GetComponent<Renderer>().material.color = Color.green;
 				cc = "g";
 				break;
 			case 3:
-				clone.renderer.material.color = Color.magenta;
+				clone.GetComponent<Renderer>().material.color = Color.magenta;
 				cc = "m";
 				break;
 			case 4:
-				clone.renderer.material.color = Color.blue;
+				clone.GetComponent<Renderer>().material.color = Color.blue;
 				cc = "b";
 				break;
 			default:
@@ -86,27 +86,27 @@ public class SpawnCreatures : MonoBehaviour {
 				switch (j)
 				{
 					case 1:
-						clone.renderer.material.color = Color.red;
+						clone.GetComponent<Renderer>().material.color = Color.red;
 						cc = "r";
 						break;
 					case 2:
-						clone.renderer.material.color = Color.blue;
+						clone.GetComponent<Renderer>().material.color = Color.blue;
 						cc = "b";
 						break;
 					case 3:
-						clone.renderer.material.color = Color.green;
+						clone.GetComponent<Renderer>().material.color = Color.green;
 						cc = "g";
 						break;
 					case 4:
-						clone.renderer.material.color = Color.magenta;
+						clone.GetComponent<Renderer>().material.color = Color.magenta;
 						cc = "m";
 						break;
 					case 5:
-						clone.renderer.material.color = Color.yellow;
+						clone.GetComponent<Renderer>().material.color = Color.yellow;
 						cc = "y";
 						break;
 					default:
-						clone.renderer.material.color = Color.red;
+						clone.GetComponent<Renderer>().material.color = Color.red;
 						cc = "r";
 						break;
 				}

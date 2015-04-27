@@ -399,8 +399,8 @@ public class CameraRotationController : MonoBehaviour {
 
 	// this is sort of the equivalent of setting the rigidbody to inactive, stopping the character from moving
 	void pausePlayer() {
-		player.rigidbody.constraints = RigidbodyConstraints.None;
-		player.rigidbody.isKinematic = true;
+		player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+		player.GetComponent<Rigidbody>().isKinematic = true;
 
 		// Rotate with camera (works all the time, but does not achieve the desired mechanic we're going for)
 		//player.transform.parent = this.transform;
@@ -430,7 +430,7 @@ public class CameraRotationController : MonoBehaviour {
 		}
 		player.transform.position = newPlayerPos;
 		player.transform.parent = null;
-		player.rigidbody.isKinematic = false;
+		player.GetComponent<Rigidbody>().isKinematic = false;
 	}
 
 }
