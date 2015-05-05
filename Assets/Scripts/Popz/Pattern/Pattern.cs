@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Pattern : MonoBehaviour {
 
-	public bool display = false; // Displays pattern when true
+	public bool display = true; // Displays pattern when true
 	private Queue<Collectible> pattern; // Collectibles in the pattern that they player has not clicked on yet
 	private Queue<Collectible> foundPattern; // Collectibles in the pattern that the player has clicked on already
 	private Collectible currentHighlighted; // Collectible that is currently outlined

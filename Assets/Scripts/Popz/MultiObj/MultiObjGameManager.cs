@@ -29,7 +29,15 @@ public class MultiObjGameManager : MonoBehaviour {
 		}
 	}
 
+	private List<Color> requiredSet = new List<Color>();
+
 	void startCreatures () {
+		requiredSet.Add (Color.red);
+		requiredSet.Add (Color.blue);
+		requiredSet.Add (Color.green);
+		requiredSet.Add (Color.magenta);
+		requiredSet.Add (Color.yellow);
+
 		FieldInfo info = Util.getFieldInfo(field);
 		for (int i = 0; i < level + numDistractors; ++i) {
 			// Universal parameters for all creatures
@@ -43,6 +51,13 @@ public class MultiObjGameManager : MonoBehaviour {
 			creature.GetComponent<CloakControl>().player = player.GetComponentInChildren<MultiObjPlayer>();
 			creature.GetComponent<CloakControl>().setColorSet(colorSet);
 			creature.GetComponent<Selection>().player = player.GetComponentInChildren<MultiObjPlayer>();
+
+			if (requiredSet.Count > 0) {
+				creature.GetComponent<CloakControl>().setRevealColor(requiredSet[0]);
+				requiredSet.RemoveAt (0);
+			} else {
+				creature.GetComponent<CloakControl>().setRandomColor();
+			}
 
 			// Distractor parameters only
 			if (i >= level) {
@@ -58,7 +73,7 @@ public class MultiObjGameManager : MonoBehaviour {
 	public void startLevel () {
 		if (stage > level) {
 			++level;
-			stage = 1;
+			stage = 5;
 		}
 		
 		if (stage <= 0) {
