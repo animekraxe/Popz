@@ -37,10 +37,17 @@ public class NbackObjControl : MonoBehaviour {
 		var radius = sphereCollider.gameObject.transform.localScale.x / 2.0f;
 		//radius += 2.0f;
 		var diameter = radius * 2; // As soon as last object has passed sphere, new object will reveal.
-		
-		if (Util.getDistance2D (sphereCollider.gameObject, this.gameObject) < diameter) {
+
+		// Reveal when past halfway of the screen
+		float halfway = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth / 2, 0)).x;
+
+		if (transform.position.x < halfway) {
 			UpdateCurrentRevealed(this);
 		}
+
+//		if (Util.getDistance2D (sphereCollider.gameObject, this.gameObject) < diameter) {
+//			UpdateCurrentRevealed(this);
+//		}
 	}
 
 	void Reveal() {
