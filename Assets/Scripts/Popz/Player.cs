@@ -12,11 +12,24 @@ public class Player : MonoBehaviour {
 
 	// For testing purposes
 	public bool canDoubleJump = true;
+	private float[] platformPositions;
+	private int currentPlatform;
+
+	private bool platforms = true;
 
 	private float screenBottom;
 	private PatternLevelManager levelManager;
 	// Use this for initialization
 	void Start() {
+
+		if (Settings.isSet) {
+			platforms = Settings.togglePlatformsNback;
+		}
+
+		if (platforms) {
+			//runningSpeed = 7.0f;
+		}
+
 		Grid grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
 		levelManager = GameObject.FindGameObjectWithTag ("LevelManager").GetComponent<PatternLevelManager> ();
 		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
@@ -25,6 +38,16 @@ public class Player : MonoBehaviour {
 		Vector3 pos = bottomLeft + grid.GridToWorld (1, 2);
 		transform.position = pos;
 		screenBottom = bottomLeft.y - 10f;
+
+		platformPositions = new float[3];
+		Debug.Log (grid.numCellsY);
+		platformPositions [2] = grid.GridToWorld (0, 6).y - (grid.cellSizeY / 2.0f); // + (grid.cellSizeY / 2.0f);
+		platformPositions [1] = grid.GridToWorld (0, 3).y - (grid.cellSizeY / 2.0f); // + (grid.cellSizeY / 2.0f);
+		platformPositions [0] = grid.GridToWorld (0, 0).y; // + (grid.cellSizeY / 2.0f);
+
+		Debug.Log (grid.GridToWorld (0, 0));
+		Debug.Log ("Cell Size Y: " + grid.cellSizeY);
+		currentPlatform = 0;
 	}
 	
 	// Update is called once per frame
@@ -36,6 +59,7 @@ public class Player : MonoBehaviour {
 			transform.Translate(new Vector3(runningSpeed * Time.deltaTime, 0f, 0f));
 		}
 		UpdateTouch ();
+		NbackPlatformsInput ();
 	}
 
 	void OnCollisionStay2D (Collision2D col) {
@@ -79,6 +103,11 @@ public class Player : MonoBehaviour {
 	public bool IsRunning { get { return canRun; } } 
 
 	void UpdateTouch () {
+		PopzGameManager gameMngr = FindObjectOfType (typeof(PopzGameManager)) as PopzGameManager;
+		if (!gameMngr.Modes().Contains (GameModes.Nback)) {
+			return;
+		}
+
 		foreach (Touch touch in Input.touches) {
 			if (touch.phase == TouchPhase.Began) {
 				Jump ();
@@ -87,13 +116,34 @@ public class Player : MonoBehaviour {
 	}
 
 	void Jump () {
-		//rigidbody2D.velocity += new Vector2(0, jumpingSpeed);
-		if (GetComponent<Rigidbody2D>().velocity.y <= 0) {
-			GetComponent<Rigidbody2D>().AddForce (Vector2.up * jumpingSpeed);
-		}
+		this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, jumpingSpeed);
 	}
 
 	void OnSwipeUp () {
 		Jump ();
+	}
+
+	private void SetPositionByPlatform(int platform) {
+		Debug.Log ("Current: " + transform.position);
+		Debug.Log ("Attempting to switch to platform: " + platform);
+		Vector3 current = transform.position;
+		current.y = platformPositions [platform];
+		transform.position = current;
+		Debug.Log ("Moving to: " + transform.position);
+		Camera.main.GetComponent<FixedHeight> ().FixPosition ();
+	}
+
+	private void NbackPlatformsInput () {
+		if (Input.GetKeyDown (KeyCode.UpArrow)) {
+			if (currentPlatform < platformPositions.Length - 1) {
+				++currentPlatform;
+				SetPositionByPlatform(currentPlatform);
+			}
+		} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
+			if (currentPlatform > 0) {
+				--currentPlatform;
+				SetPositionByPlatform(currentPlatform);
+			}
+		}
 	}
 }
