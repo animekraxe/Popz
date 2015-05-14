@@ -5,6 +5,7 @@ public class TerrainChunk : MonoBehaviour {
 
 	private TerrainGenerator terrainGen;
 	
+
 	void Start () {
 		terrainGen = GameObject.FindGameObjectWithTag ("TerrainGen").GetComponent<TerrainGenerator> ();
 	}

@@ -19,19 +19,24 @@ public class Collectible : MonoBehaviour {
 
 	void Start () {
 		pattern = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern> ();
-		levelManager = GameObject.FindGameObjectWithTag ("LevelManager").GetComponent<PatternLevelManager> ();
+		levelManager = GameObject.FindGameObjectWithTag ("PatternLevelManager").GetComponent<PatternLevelManager> ();
 	}
 
 	void OnMouseDown () {
 		if (!selectable || pattern.display) { return; }
-		if (pattern.current.color == color && pattern.current.species == species) {
-			Destroy (gameObject);
-			pattern.foundCollectible();
-			AudioSource.PlayClipAtPoint(success, transform.position);
-		} 
-		else {
-			levelManager.FailedPattern();
-			AudioSource.PlayClipAtPoint(fail, transform.position);
+		if(pattern.patternCount != 0)
+		{
+			if (pattern.current.color == color && pattern.current.species == species) 
+			{
+				Destroy (gameObject);
+				pattern.foundCollectible();
+				AudioSource.PlayClipAtPoint(success, transform.position);
+			}	 
+			else 
+			{
+				levelManager.FailedPattern();
+				AudioSource.PlayClipAtPoint(fail, transform.position);
+			}
 		}
 	}
 

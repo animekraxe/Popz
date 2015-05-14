@@ -14,9 +14,7 @@ public class CloakControl : MonoBehaviour {
 	// Cloak State Variables
 	private Material initMaterial;
 	private Material revealMaterial;
-	private Color revealColor;
 	private float revealTicker;
-
 
 	private List<Color> colorSet;
 	public AudioClip success;
@@ -45,7 +43,7 @@ public class CloakControl : MonoBehaviour {
 	private void updateCloak () {
 		if (revealTicker > 0) {
 			revealTicker -= Time.deltaTime;
-			GetComponent<Renderer>().material.color = revealColor;
+			GetComponent<Renderer>().material = revealMaterial;
 		}
 		else {
 			GetComponent<Renderer>().material = initMaterial;
@@ -102,13 +100,5 @@ public class CloakControl : MonoBehaviour {
 			player.AddToScore (-100, !isDistractor());
 			AudioSource.PlayClipAtPoint(fail, this.transform.position);
 		}
-	}
-
-	public void setRevealColor (Color col) {
-		revealColor = col;
-	}
-
-	public void setRandomColor () {
-		revealColor = Util.randomColorFromSet (colorSet);
 	}
 }

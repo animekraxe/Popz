@@ -5,7 +5,6 @@ public class Menu : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Screen.SetResolution (1024, 768, true);
 	}
 	
 	// Update is called once per frame
@@ -23,7 +22,6 @@ public class Menu : MonoBehaviour {
 		var patternLabel = "Enable Pattern Game";
 		var nbackLabel = "Enable Nback Game";
 		var multiObjLabel = "Enable Multi Object Game";
-		var platformsLabel = "Enable Platform Nbacks Game";
 
 		float width = 200;
 		float height = 30;
@@ -36,10 +34,7 @@ public class Menu : MonoBehaviour {
 		Settings.toggleMultiObj = GUI.Toggle (new Rect (10, startY + (height * 2), width, height), 
 		                                      Settings.toggleMultiObj, multiObjLabel);
 
-		Settings.togglePlatformsNback = GUI.Toggle (new Rect (10, startY + (height * 3), width, height),
-		                                            Settings.togglePlatformsNback, platformsLabel);
-
-		if (GUI.Button (new Rect (10, startY + (height * 4), width, height), "Play Game")) {
+		if (GUI.Button (new Rect (10, startY + (height * 3), width, height), "Play Game")) {
 			Settings.isSet = true;
 			Application.LoadLevel("Popz");
 		}

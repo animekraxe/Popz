@@ -12,6 +12,7 @@ public class Grid : MonoBehaviour {
 	private bool[,] grid; // grid[x,y] is true is the grid cell (x,y) contains an object
 
 	void Awake () {	
+
 		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
 		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
 		width = topRight.x - bottomLeft.x;
@@ -20,12 +21,11 @@ public class Grid : MonoBehaviour {
 		cellSizeX = 1.6f;
 		numCellsX = Mathf.CeilToInt (width / cellSizeX);
 		grid = new bool[numCellsX * 2, numCellsY];
+
 	}
 
 	// Calculates cell sizes and sets up position
 	void Start () {
-
-
 	}
 
 	public void ClearGrid () {

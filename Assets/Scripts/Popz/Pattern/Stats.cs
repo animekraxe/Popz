@@ -7,7 +7,7 @@ public class Stats : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		levelManager = GameObject.FindGameObjectWithTag ("LevelManager").GetComponent<PatternLevelManager> ();
+		levelManager = GameObject.FindGameObjectWithTag ("PatternLevelManager").GetComponent<PatternLevelManager> ();
 	}
 
 	void OnGUI () {

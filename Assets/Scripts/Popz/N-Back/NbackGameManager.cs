@@ -9,10 +9,9 @@ public class NbackGameManager : MonoBehaviour {
 	// Display Rate.
 	public float rate = 3;
 
-	public bool platforms = true;
-
 	// Use this for initialization
 	void Start () {
+	
 	}
 	
 	// Update is called once per frame

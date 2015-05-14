@@ -5,8 +5,11 @@ public class CollectibleGenerator : MonoBehaviour {
 
 	public Transform[] collectibles; // Possible collectibles that will be generated
 	public float spawnChance = 0.9f; // The chance a collectible will be generated in a grid cell
+	private Pattern pattern;
 
 	void Start () {
+		pattern = GameObject.FindGameObjectWithTag ("Pattern").GetComponent<Pattern> ();
+
 		Grid grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
 		for (int i = 0; i < collectibles.Length; i++) {
 			BoxCollider boxCol = collectibles[i].GetComponent<BoxCollider> ();
@@ -20,10 +23,15 @@ public class CollectibleGenerator : MonoBehaviour {
 	public void GenerateCollectibles (Grid grid, TerrainChunk tc) {
 		for (int x = 0; x < grid.numCellsX; x++) {
 			for (int y = 3; y < grid.numCellsY; y+=2) {
-				if (Random.value > spawnChance || !grid.containsObject(x,y-1)) {
+				if (Random.value > spawnChance || !grid.containsObject(x,y-1)) { //Spawn Chance or there is a platform underneath
 					continue;
 				}
+				/*if(!grid.containsObject(x,y-1)) // Make sure that there is platform underneath.
+				{
+					continue;
+				}*/
 				int collectibleType = Random.Range (0, collectibles.Length);
+				/*This is where we actually generate the plants!*/
 				GenerateCollectible (x, y, collectibleType, grid, tc);
 			}
 		}
@@ -44,8 +52,54 @@ public class CollectibleGenerator : MonoBehaviour {
 	// Generates collectible of the specified type at world coordinates (x,y)
 	public Transform GenerateCollectible (float x, float y, int type) {
 		Vector3 spawnPos = new Vector3 (x,y,0); 
+
+		Debug.Log (type);
 		Transform t = GameObject.Instantiate (collectibles [type], spawnPos, Quaternion.identity) as Transform;
+		//Transform t = GameObject.Instantiate (pattern.patternList[type], spawnPos, Quaternion.identity) as Transform;
+
 		Collectible col = t.gameObject.GetComponent<Collectible>();
 		return t;
 	}
+
+	//No TerrainChunk
+	public void GenerateCollectibles (Grid grid, GameObject cloud) 
+	{
+
+		for (int x = 0; x < grid.numCellsX; x++) 
+		{
+			for (int y = 3; y < grid.numCellsY; y+=2) 
+			{
+				if (Random.value > spawnChance || !grid.containsObject(x,y-1)) 
+				{ //Spawn Chance or there is a platform underneath
+					continue;
+				}
+				/*if(!grid.containsObject(x,y-1)) // Make sure that there is platform underneath.
+				{
+					continue;
+				}*/
+				int collectibleType = Random.Range (0, collectibles.Length);
+				//int collectibleType = Random.Range (0, pattern.patternList.Count);
+
+				/*This is where we actually generate the plants!*/
+				GenerateCollectible (x, y, collectibleType, grid, cloud);
+			}
+		}
+	}
+
+	public void GenerateCollectible (int x, int y, int type, Grid grid, GameObject cloud) 
+	{
+		if (grid.containsObject(x, y)) 
+		{
+			//return null;
+		}
+		Vector3 spawnPos = grid.GridToWorld (x,y) + cloud.transform.position;
+		Transform t = GenerateCollectible (spawnPos.x, spawnPos.y, type);
+		t.parent = cloud.gameObject.transform;
+		grid.MarkGrid (x, y);
+		//return t;
+	}
+
+
+
+
 }

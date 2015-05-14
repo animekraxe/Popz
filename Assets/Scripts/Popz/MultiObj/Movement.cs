@@ -17,7 +17,7 @@ public class Movement : MonoBehaviour {
 	public Vector3 target;
 	public float pushSpeed = 0.0f;
 
-	private float speed = 5.0f;
+	private float speed = 3.0f;
 	private float moveTicker;
 	private float moveWaitTime = 2f;
 	private int direction;
