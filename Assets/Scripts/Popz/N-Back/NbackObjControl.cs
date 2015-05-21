@@ -32,8 +32,9 @@ public class NbackObjControl : MonoBehaviour {
 
 	void UpdateReveal() {
 		var sphereCollider = player.gameObject.GetComponentInChildren<SphereCollider> ();
-		var radius = sphereCollider.gameObject.transform.localScale.x / 2.0f;
+		//var radius = sphereCollider.gameObject.transform.localScale.x / 2.0f;
 		//radius += 2.0f;
+		var radius = 1.0f;
 		var diameter = radius * 2; // As soon as last object has passed sphere, new object will reveal.
 		
 		if (Util.getDistance2D (sphereCollider.gameObject, this.gameObject) < diameter) {

@@ -6,6 +6,7 @@ public class Settings : MonoBehaviour {
 	static public bool toggleNback = true;
 	static public bool toggleMultiObj = true;
 	static public bool isSet = false;
+	static public int nbackNavigationDifficulty = 3;
 
 	void Awake () {
 		DontDestroyOnLoad (this);

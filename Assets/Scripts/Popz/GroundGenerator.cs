@@ -2,8 +2,13 @@
 using System.Collections;
 
 public class GroundGenerator : MonoBehaviour {
-
+		
 	public Transform groundPiece;
+
+	public Transform ground1wide;
+	public Transform ground2wide;
+	public Transform ground3wide;
+
 	public float pitSpawnChance = 0.15f;
 	public float hillSpawnChance = 0.15f;
 
@@ -13,7 +18,7 @@ public class GroundGenerator : MonoBehaviour {
 	void Start () {
 		Grid grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
 		if (grid != null) {
-			groundPiece.localScale = new Vector3(grid.cellSizeX, grid.cellSizeY, 1f);
+			//groundPiece.localScale = new Vector3(grid.cellSizeX, grid.cellSizeY, 1f);
 		}
 	}
 	
@@ -46,8 +51,36 @@ public class GroundGenerator : MonoBehaviour {
 	public Transform GenerateGround (float x, float y) {
 		Vector3 spawnPos = new Vector3 (x,y,0); 
 		Transform t = GameObject.Instantiate (groundPiece, spawnPos, Quaternion.identity) as Transform;
+		//t.Rotate (new Vector3 (0, 0, 180));
 		return t;
 	}
 
+	public Transform GenerateWideGround (int x, int y, int wide, Grid grid, TerrainChunk tc) {
+		for (int i = x; i < x + wide; ++i) {
+			if (grid.containsObject(i, y)) {
+				return null;
+			}
+		}
 
+		Vector3 spawnPos = new Vector3 (0, 0, 0);
+		for (int i = x; i < x + wide; ++i) {
+			spawnPos += grid.GridToWorld(i, y);
+		}
+
+		spawnPos /= wide;
+		spawnPos += tc.transform.position;
+
+		//Vector3 spawnPos = grid.GridToWorld (x, y) + tc.transform.position;
+		spawnPos.z = 0;
+		Transform piece = wide == 3 ? ground3wide : (wide == 2 ? ground2wide : ground1wide);
+		Transform t = GameObject.Instantiate (piece, spawnPos, Quaternion.identity) as Transform;
+
+		for (int i = x; i < x + wide; ++i) {
+			grid.MarkGrid(i, y);
+		}
+
+		Debug.Log ("Created in grid: " + x + ", " + y + "width: " + wide);
+
+		return t;
+	}
 }

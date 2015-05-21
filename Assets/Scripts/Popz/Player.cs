@@ -13,16 +13,33 @@ public class Player : MonoBehaviour {
 	private PatternLevelManager levelManager;
 	// Use this for initialization
 	void Start() {
-
-		Grid grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
-		levelManager = GameObject.FindGameObjectWithTag ("PatternLevelManager").GetComponent<PatternLevelManager> ();
-		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
-		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
-		bottomLeft.y = Camera.main.GetComponent<FixedHeight> ().height - (topRight.y - bottomLeft.y)/2f;
-		Vector3 pos = bottomLeft + grid.GridToWorld (1, 2);
-		transform.position = pos;
-		screenBottom = bottomLeft.y - 10f;
-
+//
+//		if (Settings.isSet) {
+//			platforms = Settings.togglePlatformsNback;
+//		}
+//
+//		if (platforms) {
+//			//runningSpeed = 7.0f;
+//		}
+//
+//		Grid grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
+//		levelManager = GameObject.FindGameObjectWithTag ("LevelManager").GetComponent<PatternLevelManager> ();
+//		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
+//		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
+//		bottomLeft.y = Camera.main.GetComponent<FixedHeight> ().height - (topRight.y - bottomLeft.y)/2f;
+//		Vector3 pos = bottomLeft + grid.GridToWorld (1, 2);
+//		transform.position = pos;
+//		screenBottom = bottomLeft.y - 10f;
+//
+//		platformPositions = new float[3];
+//		Debug.Log (grid.numCellsY);
+//		platformPositions [2] = grid.GridToWorld (0, 6).y - (grid.cellSizeY / 2.0f); // + (grid.cellSizeY / 2.0f);
+//		platformPositions [1] = grid.GridToWorld (0, 3).y - (grid.cellSizeY / 2.0f); // + (grid.cellSizeY / 2.0f);
+//		platformPositions [0] = grid.GridToWorld (0, 0).y; // + (grid.cellSizeY / 2.0f);
+//
+//		Debug.Log (grid.GridToWorld (0, 0));
+//		Debug.Log ("Cell Size Y: " + grid.cellSizeY);
+//		currentPlatform = 0;
 	}
 	
 	// Update is called once per frame
@@ -93,6 +110,34 @@ public class Player : MonoBehaviour {
 	}
 
 	void OnSwipeUp () {
-		GetComponent<Rigidbody2D>().velocity += new Vector2(0, jumpingSpeed);
+		Jump ();
+	}
+
+	private void SetPositionByPlatform(int platform) {
+		Debug.Log ("Current: " + transform.position);
+		Debug.Log ("Attempting to switch to platform: " + platform);
+		Vector3 current = transform.position;
+		current.y = platformPositions [platform];
+		transform.position = current;
+		Debug.Log ("Moving to: " + transform.position);
+		Camera.main.GetComponent<FixedHeight> ().FixPosition ();
+	}
+
+	private void NbackPlatformsInput () {
+		if (Input.GetKeyDown (KeyCode.UpArrow)) {
+			if (currentPlatform < platformPositions.Length - 1) {
+				++currentPlatform;
+				SetPositionByPlatform(currentPlatform);
+			}
+		} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
+			if (currentPlatform > 0) {
+				--currentPlatform;
+				SetPositionByPlatform(currentPlatform);
+			}
+		} else if (Input.GetKey (KeyCode.LeftArrow)) {
+			//transform.Translate(new Vector3(-5.0f * Time.deltaTime, 0, 0));
+		} else if (Input.GetKey (KeyCode.RightArrow)) {
+			//transform.Translate(new Vector3(5.0f * Time.deltaTime, 0, 0));
+		}
 	}
 }
