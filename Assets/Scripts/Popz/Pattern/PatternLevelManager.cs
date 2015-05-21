@@ -94,10 +94,9 @@ public class PatternLevelManager : MonoBehaviour {
 		else
 		{
 			Application.LoadLevel(0);
-
 		}
-
 	}
+
 	public void CloudCompleted()
 	{
 		numLives++;
@@ -105,6 +104,14 @@ public class PatternLevelManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		// Quick and dirty game disable. Need more state machines.
+		PopzGameManager mngr = FindObjectOfType (typeof(PopzGameManager)) as PopzGameManager;
+		if (!mngr.Modes ().Contains (GameModes.Pattern)) {
+			LivesText.SetActive(false);
+			RoundsText.SetActive(false);
+			return;
+		}
+
 		//Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
 		//Debug.Log ("BottomLeft: " +  bottomLeft);
 		LivesText.GetComponent<Text>().text = "Lives: "+numLives.ToString();

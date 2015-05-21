@@ -107,7 +107,6 @@ public class TerrainGenerator : MonoBehaviour {
 		// Generate ground
 		groundGen.GenerateGrounds(grid, tc);
 
-
 		// Generate For Pattern
 		if (gameMngr.Modes ().Contains (GameModes.Pattern)) {
 
@@ -121,14 +120,11 @@ public class TerrainGenerator : MonoBehaviour {
 			{
 				collectibleGen.GenerateCollectibles (grid, tc);
 			}*/
-			
-		
 		}
-
 
 		// Generate For Nback
 		if (gameMngr.Modes ().Contains (GameModes.Nback)) {
-			nbackGen.GenerateNbackInGrid (grid, tc);
+			nbackGen.GenerateNbackInGrid (grid, tc, groundGen);
 		}
 	}
 }

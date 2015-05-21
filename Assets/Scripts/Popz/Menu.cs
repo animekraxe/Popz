@@ -5,6 +5,7 @@ public class Menu : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Screen.SetResolution (1024, 768, true);
 	}
 	
 	// Update is called once per frame
@@ -45,6 +46,7 @@ public class Menu : MonoBehaviour {
 		var patternLabel = "Enable Pattern Game";
 		var nbackLabel = "Enable Nback Game";
 		var multiObjLabel = "Enable Multi Object Game";
+		var platformsLabel = "Enable Platform Nbacks Game";
 
 		float width = 200;
 		float height = 30;

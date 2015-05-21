@@ -9,6 +9,14 @@ public class Player : MonoBehaviour {
 
 	public bool canRun = true;
 	public bool canJump = true;
+
+	// For testing purposes
+	public bool canDoubleJump = true;
+	private float[] platformPositions;
+	private int currentPlatform;
+
+	private bool platforms = true;
+
 	private float screenBottom;
 	private PatternLevelManager levelManager;
 	// Use this for initialization
@@ -44,21 +52,18 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-		//Just off screen:
-
-
 		if (jumpEnabled && canJump && Input.GetKeyDown ("space")){
-			GetComponent<Rigidbody2D>().velocity += new Vector2(0, jumpingSpeed);
+			Jump ();
 		}
 		if (canRun) {
 			transform.Translate(new Vector3(runningSpeed * Time.deltaTime, 0f, 0f));
 		}
 		UpdateTouch ();
+		NbackPlatformsInput ();
 	}
 
 	void OnCollisionStay2D (Collision2D col) {
-		/*if (col.gameObject.tag.Equals ("Ground")) {
+		if (col.gameObject.tag.Equals ("Ground")) {
 			foreach (ContactPoint2D cp in col.contacts) {
 				if (cp.normal.y == 1) {
 					canJump = true;
@@ -74,12 +79,14 @@ public class Player : MonoBehaviour {
 					canJump = true;
 				}
 			}
-		}*/
+		}
 	}
 	
 	void OnCollisionExit2D (Collision2D col) {
-		/*if (col.gameObject.tag.Equals ("Ground")) {
-			canJump = false;
+		if (col.gameObject.tag.Equals ("Ground")) {
+			if (!canDoubleJump) {
+				canJump = false;
+			}
 		}
 		else if (col.gameObject.tag.Equals("Hill")) {
 			foreach (ContactPoint2D cp in col.contacts) {
@@ -90,23 +97,26 @@ public class Player : MonoBehaviour {
 					canJump = false;
 				}
 			}
-		}*/
+		}
 	}
 
 	public bool IsRunning { get { return canRun; } } 
 
 	void UpdateTouch () {
+		PopzGameManager gameMngr = FindObjectOfType (typeof(PopzGameManager)) as PopzGameManager;
+		if (!gameMngr.Modes().Contains (GameModes.Nback)) {
+			return;
+		}
+
 		foreach (Touch touch in Input.touches) {
 			if (touch.phase == TouchPhase.Began) {
-				Ray ray = Camera.main.ScreenPointToRay (touch.position);
-				RaycastHit hit;
-				if (Physics.Raycast(ray, out hit)) {
-					if (hit.collider.tag == "Player") {
-						hit.collider.gameObject.GetComponent<Rigidbody2D>().velocity += new Vector2(0, jumpingSpeed);
-					}
-				}
+				Jump ();
 			}
 		}
+	}
+
+	void Jump () {
+		this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, jumpingSpeed);
 	}
 
 	void OnSwipeUp () {

@@ -16,5 +16,7 @@ public class FixedHeight : MonoBehaviour {
 		transform.position = new Vector3(transform.position.x, height, transform.position.z);
 	}
 
-
+	public void FixPosition () {
+		transform.position = new Vector3(transform.position.x, height, transform.position.z);
+	}
 }

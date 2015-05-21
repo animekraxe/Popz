@@ -59,11 +59,12 @@ public class Pattern : MonoBehaviour {
 
 
 	void Awake () {
-		player = GameObject.FindGameObjectWithTag ("Player").GetComponent<Player> ();
-		BGManager = GameObject.FindGameObjectWithTag ("Backgrounds").GetComponent<BackgroundManager> ();
-		grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
-		offset = new Vector3(grid.cellSizeX, 0f, 0f);
+		//player = GameObject.FindGameObjectWithTag ("Player").GetComponent<Player> ();
+		//BGManager = GameObject.FindGameObjectWithTag ("Backgrounds").GetComponent<BackgroundManager> ();
+		//grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
+
 		collectibleGen = GameObject.FindGameObjectWithTag ("CollectibleGen").GetComponent<CollectibleGenerator> ();
+
 		patternList = new List<Collectible>();
 		foundPattern = new Queue<Collectible> ();
 
@@ -73,17 +74,19 @@ public class Pattern : MonoBehaviour {
 
 	void Start () {
 
-		player = GameObject.FindGameObjectWithTag ("Player").GetComponent<Player> ();
-		BGManager = GameObject.FindGameObjectWithTag ("Backgrounds").GetComponent<BackgroundManager> ();
+		//player = GameObject.FindGameObjectWithTag ("Player").GetComponent<Player> ();
+		//BGManager = GameObject.FindGameObjectWithTag ("Backgrounds").GetComponent<BackgroundManager> ();
 		patternManager = GameObject.FindGameObjectWithTag ("PatternLevelManager").GetComponent<PatternLevelManager> ();
+
 		grid = GameObject.FindGameObjectWithTag ("Grid").GetComponent<Grid> ();
+		offset = new Vector3(grid.cellSizeX, 0f, 0f);
+
 		Vector3 bottomLeft = Camera.main.ScreenToWorldPoint (new Vector3 (0f, 0f, 0f));
 		Vector3 topRight = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, Camera.main.pixelHeight, 0f));
 		bottomLeft.y = Camera.main.GetComponent<FixedHeight> ().height - (topRight.y - bottomLeft.y)/2f;
 		center = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth/2, 3*Camera.main.pixelHeight/4, 0f));
 		transform.position = center;
-		CubeBG.SetActive(false);
-
+		//CubeBG.SetActive(false);
 	}
 
 	void Update () {
@@ -116,9 +119,7 @@ public class Pattern : MonoBehaviour {
 		{
 			revImage.SetActive(true);
 		}
-		CubeBG.SetActive(true);
-
-
+		//CubeBG.SetActive(true);
 	}
 
 	// Hides the pattern from the player
@@ -134,8 +135,7 @@ public class Pattern : MonoBehaviour {
 		{
 			revImage.SetActive(false);
 		}
-		CubeBG.SetActive(false);
-
+		//CubeBG.SetActive(false);
 	}
 
 	// Reveals the pattern to the player for the specified amount of time
@@ -252,9 +252,5 @@ public class Pattern : MonoBehaviour {
 
 		//transform.position.x -= 1.25*length;
 		RevealPattern ();
-
-
 	}
-
-
 }
