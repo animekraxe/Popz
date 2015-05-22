@@ -61,8 +61,8 @@ public class NbackGenerator : MonoBehaviour {
 		// Generate beginning so character doesnt fall
 		if (generateCount == 0) {
 			for (int i = 0; i < 5; ++i) {
-				ggen.GenerateGround (i, 0, grid, tc);
-				ggen.GenerateGround (i, 7, grid, tc);
+				//ggen.GenerateGround (i, 0, grid, tc);
+				//ggen.GenerateGround (i, 7, grid, tc);
 			}
 		}
 		++generateCount;
@@ -83,12 +83,12 @@ public class NbackGenerator : MonoBehaviour {
 
 		// Generate ground and potholes
 		for (int i = 0; i < grid.numCellsX; ++i) {
-			// For floor
-			// Generate ground (NOT pothole) by scale and difficulty
 			if (grid.containsObject(i, 0)) {
 				Debug.Log ("Grid Contains at: " + i);
 				continue;
 			}
+
+			// Generate random width ground pieces varying from 1-3
 			int cap = Mathf.Min (4, grid.numCellsX - i + 1);
 			int roll = Random.Range (1, cap);
 
@@ -123,7 +123,7 @@ public class NbackGenerator : MonoBehaviour {
 
 	Transform GenerateNbackObject(float x, float y) {
 		Vector3 spawnPos = new Vector3 (x, y, 0); 
-		Debug.Log ("Generating at: " + spawnPos);
+		//Debug.Log ("Generating at: " + spawnPos);
 		Transform t = GameObject.Instantiate (nbackObject, spawnPos, Quaternion.identity) as Transform;
 		NbackObjControl ctrl = t.gameObject.GetComponent<NbackObjControl> ();
 

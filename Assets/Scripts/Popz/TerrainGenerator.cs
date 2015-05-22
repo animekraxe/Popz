@@ -101,11 +101,11 @@ public class TerrainGenerator : MonoBehaviour {
 
 	public void GenerateTerrain (Vector3 spawnPos) {
 		grid.ClearGrid ();
-		//Debug.Log (spawnPos.y);
 		TerrainChunk tc = GameObject.Instantiate (terrainChunk, spawnPos, Quaternion.identity) as TerrainChunk;
 
 		// Generate ground
-		groundGen.GenerateGrounds(grid, tc);
+		// Experimental: Generate ground separately for Nback
+		// groundGen.GenerateGrounds(grid, tc);
 
 		// Generate For Pattern
 		if (gameMngr.Modes ().Contains (GameModes.Pattern)) {
@@ -125,6 +125,8 @@ public class TerrainGenerator : MonoBehaviour {
 		// Generate For Nback
 		if (gameMngr.Modes ().Contains (GameModes.Nback)) {
 			nbackGen.GenerateNbackInGrid (grid, tc, groundGen);
+		} else { 
+			groundGen.GenerateGrounds (grid, tc);
 		}
 	}
 }

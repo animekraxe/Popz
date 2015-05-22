@@ -67,7 +67,7 @@ public class Grid : MonoBehaviour {
 	// Is true if grid cell (x,y) contains an object 
 	public bool containsObject (int x, int y) {
 		if (x > grid.GetLength(0) || y > grid.GetLength(1) || x < 0 || y < 0) {
-			//Debug.Log ("out of bounds grid");
+			Debug.Log ("out of bounds grid");
 			return false;
 		}
 		else {
