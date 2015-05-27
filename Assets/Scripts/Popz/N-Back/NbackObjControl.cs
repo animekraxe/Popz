@@ -1,21 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NbackObjControl : MonoBehaviour {
-	
-	private Color revealColor;
-	private Player player;
-	private bool isCorrect = false;
+// Mineral types
+public enum Mineral {
+	Yellow,
+	Green,
+	Red,
+	Blue,
+	White,
+};
 
+public class NbackObjControl : MonoBehaviour {
 	public AudioClip success;
 	public AudioClip fail;
+	public Mineral type;
+	public Sprite cloakSprite;
+	private Sprite revealSprite;
 
+	private bool isCorrect = false;
+
+	// The currently revealed object on the screen
 	static NbackObjControl currentRevealed = null;
 
 	// Use this for initialization
 	void Start () {
-		player = GameObject.FindGameObjectWithTag ("Player").GetComponent<Player> ();
-		GetComponent<Renderer>().material.color = Color.black;
+		revealSprite = GetComponent<SpriteRenderer> ().sprite;
+		GetComponent<SpriteRenderer> ().sprite = cloakSprite;
 	}
 	
 	// Update is called once per frame
@@ -33,45 +43,28 @@ public class NbackObjControl : MonoBehaviour {
 	}
 
 	void UpdateReveal() {
-		var sphereCollider = player.gameObject.GetComponentInChildren<SphereCollider> ();
-		//var radius = sphereCollider.gameObject.transform.localScale.x / 2.0f;
-		//radius += 2.0f;
-		var radius = 1.0f;
-		var diameter = radius * 2; // As soon as last object has passed sphere, new object will reveal.
-
 		// Reveal when past halfway of the screen
 		float halfway = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth / 2, 0)).x;
 
 		if (transform.position.x < halfway) {
 			UpdateCurrentRevealed(this);
 		}
-
-//		if (Util.getDistance2D (sphereCollider.gameObject, this.gameObject) < diameter) {
-//			UpdateCurrentRevealed(this);
-//		}
 	}
 
 	void Reveal() {
-		GetComponent<Renderer>().material.color = revealColor;
+		GetComponent<SpriteRenderer> ().sprite = revealSprite;
 	}
 
 	void Cloak() {
-		GetComponent<Renderer>().material.color = Color.black;
+		GetComponent<SpriteRenderer> ().sprite = cloakSprite;
 	}
 
 	static void UpdateCurrentRevealed(NbackObjControl next) {
-		if (currentRevealed) {
-			currentRevealed.Cloak ();	
-		}
 		currentRevealed = next;
 		next.Reveal ();
 	}
 
 	public void MarkCorrect() {
 		isCorrect = true;
-	}
-
-	public void MarkColor(Color color) {
-		revealColor = color;
 	}
 }

@@ -3,40 +3,59 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+public enum ParallaxLayer {
+	Background,
+	Midground,
+	Nearground,
+};
+
 public class ParallaxBackground : MonoBehaviour {
 
+	// Images
 	public List<Transform> images; // Images in sequence that make up the background
-	private List<Transform> background;
 
-	public float speed = 0.5f; // Note: Bigger speed means slower looking background
+	// Parallax
+	public ParallaxLayer layer;
+	public float speed; // Note: Bigger speed means slower looking background
 	private float offset;
+
+	// Nearground Rotation
+	private float nearRotateMin = -45.0f;
+	private float nearRotateMax = 25.0f;
 
 	private Transform cam;
 	private Vector3 previousCamPos;
 
 	void Awake () {
+		// Get Camera Link
 		cam = Camera.main.transform;
-		//Screen.SetResolution (2048, 1536, false);
-		//Screen.SetResolution (1440, 900, false);
 	}
 
 	// Use this for initialization
 	void Start () {
-		offset = images [0].gameObject.GetComponent<SpriteRenderer> ().bounds.size.x - 0.1f;
+		// Set offset to the size of one image so that there are no seams when arranging
+		if (layer == ParallaxLayer.Background) {
+			offset = images [0].gameObject.GetComponent<SpriteRenderer> ().bounds.size.x - 0.1f;
+		} 
+		// Set offset to screen width so layer items don't clutter the screen
+		else {
+			Vector3 start = Camera.main.ScreenToWorldPoint (new Vector3 (0, 0, 0));
+			Vector3 end = Camera.main.ScreenToWorldPoint (new Vector3 (Camera.main.pixelWidth, 0, 0));
+			offset = end.x - start.x;
+		}
 
-		offset = 10.19f;
-
-		Debug.Log (offset);
 		ArrangeImages ();
 
+		// Start Camera Link
 		previousCamPos = cam.position;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//Debug.Log ("Resolution: " + Camera.main.pixelWidth);
 		PollForOffscreenImage ();
 		ParallaxMove ();
+
+		// Update Camera link
 		previousCamPos = cam.position;
 	}
 
@@ -50,15 +69,31 @@ public class ParallaxBackground : MonoBehaviour {
 			Transform prev = images[i - 1];
 
 			curr.position = prev.position + new Vector3(offset, 0, 0);
-			FloorImage(curr);
+			FloorImage (curr);
+			RotateImage (curr);
 		}
 	}
 
 	void FloorImage (Transform img) {
+		// Rotations affect height calculation. Set it to 0 and save it
+		Vector3 angles = img.localEulerAngles;
+		img.localEulerAngles = Vector3.zero;
+
 		float height = img.gameObject.GetComponent<SpriteRenderer> ().bounds.size.y;
 		Vector3 floor = img.position;
 		floor.y = this.transform.position.y + (height / 2.0f);
 		img.position = floor;
+
+		// Set original rotation
+		img.localEulerAngles = angles;
+	}
+
+	void RotateImage (Transform img) {
+		// Randomly rotate nearground images between 45 and -45 degrees on Z axis
+		if (layer == ParallaxLayer.Nearground) {
+			float rand = Random.Range (nearRotateMin, nearRotateMax);
+			img.localEulerAngles = new Vector3 (0, 0, rand);
+		}
 	}
 
 	void RepositionBottomLeft (Transform img) {
@@ -74,6 +109,7 @@ public class ParallaxBackground : MonoBehaviour {
 		images.Remove (img);
 		img.position = end.position + new Vector3 (offset, 0, 0);
 		FloorImage (img);
+		RotateImage (img);
 		img.gameObject.GetComponent<Background> ().isOffscreen = false;
 		images.Add (img);
 	}
@@ -99,7 +135,7 @@ public class ParallaxBackground : MonoBehaviour {
 		move *= speed * Time.deltaTime;
 
 		foreach (Transform image in images) {
-			image.transform.Translate(move);
+			image.transform.position += move;
 		}
 	}
 }

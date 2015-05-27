@@ -88,7 +88,7 @@ public class Util : MonoBehaviour {
 		return (x2D - y2D).magnitude;
 	}
 
-	static public bool checkNbackMatch (List<Color> sequence, int n) {
+	static public bool checkNbackMatch (List<Mineral> sequence, int n) {
 		if (n >= sequence.Count) {
 			return false;
 		}

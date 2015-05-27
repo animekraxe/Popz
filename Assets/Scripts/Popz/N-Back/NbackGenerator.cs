@@ -5,7 +5,7 @@ using System.Linq;
 
 public class NbackGenerator : MonoBehaviour {
 
-	public Transform nbackObject;
+	public List<Transform> nbackObjects;
 	public int nLevel = 2;
 	public int rate = 5;
 
@@ -13,7 +13,7 @@ public class NbackGenerator : MonoBehaviour {
 	public int navigationDifficulty = 0;
 
 	private int lastGridOffset;
-	private List<Color> sequence = new List<Color>();
+	private List<Mineral> sequence = new List<Mineral>();
 
 	void Awake () {
 		if (Settings.isSet) {
@@ -81,32 +81,9 @@ public class NbackGenerator : MonoBehaviour {
 			Transform h = GenerateNbackObjectInGrid(x, y, grid, tc);
 		}
 
-		// Generate ground and potholes
-		for (int i = 0; i < grid.numCellsX; ++i) {
-			if (grid.containsObject(i, 0)) {
-				Debug.Log ("Grid Contains at: " + i);
-				continue;
-			}
+		ggen.GenerateGrounds (grid, tc, 0, false);
+		ggen.GenerateGrounds (grid, tc, 7, true);
 
-			// Generate random width ground pieces varying from 1-3
-			int cap = Mathf.Min (4, grid.numCellsX - i + 1);
-			int roll = Random.Range (1, cap);
-
-			while (!ggen.GenerateWideGround(i, 0, roll, grid, tc)) {
-				roll = Random.Range (1, 4);
-			}
-
-//			int rand = Random.Range(0, 100);
-//			if (rand > difficulty * scale) {
-//				ggen.GenerateGround (i, 0, grid, tc);
-//			}
-//
-//			// For Ceiling
-//			rand = Random.Range(0, 100);
-//			if (rand > difficulty * scale) {
-//				//ggen.GenerateGround (i, 7, grid, tc);
-//			}
-		}
 		lastGridOffset = x - grid.numCellsX;
 	}
 
@@ -123,14 +100,14 @@ public class NbackGenerator : MonoBehaviour {
 
 	Transform GenerateNbackObject(float x, float y) {
 		Vector3 spawnPos = new Vector3 (x, y, 0); 
-		//Debug.Log ("Generating at: " + spawnPos);
-		Transform t = GameObject.Instantiate (nbackObject, spawnPos, Quaternion.identity) as Transform;
+
+		// Generate Random Nback Object
+		int rand = Random.Range (0, nbackObjects.Count);
+		Transform t = GameObject.Instantiate (nbackObjects [rand], spawnPos, Quaternion.identity) as Transform;
 		NbackObjControl ctrl = t.gameObject.GetComponent<NbackObjControl> ();
 
-		// Update color sequence
-		Color color = Util.randomColor ();
-		sequence.Add (color);
-		ctrl.MarkColor (color);
+		// Register in sequence
+		sequence.Add (ctrl.type);
 		if (Util.checkNbackMatch(sequence, nLevel)) {
 			ctrl.MarkCorrect();
 		}
