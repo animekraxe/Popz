@@ -45,7 +45,7 @@ public class Selection : MonoBehaviour {
 			GetComponent<Renderer>().material.color = Color.black;
 		}
 	}
-
+	/*
 	static public void DoSelection() {
 		if (Selection.closestObj.GetComponent<CloakControl>().isRevealed()) {
 			return;
@@ -63,5 +63,5 @@ public class Selection : MonoBehaviour {
 		Selection.closestObj.GetComponent<CloakControl> ().validate ();
 		Selection.closestObj.gameObject.SetActive(false);
 		Selection.closestObj = null;
-	}
+	}*/
 }
