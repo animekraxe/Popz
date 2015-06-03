@@ -42,7 +42,12 @@ public class GroundGenerator : MonoBehaviour {
 			if (grid.containsObject(i, y)) {
 				continue;
 			}
-			
+
+			int rand = Random.Range (0, 101);
+			if (rand < level) {
+				continue;
+			}
+
 			// Generate random width ground pieces varying from 1-3
 			int cap, roll;
 			do {
@@ -74,8 +79,11 @@ public class GroundGenerator : MonoBehaviour {
 		Transform piece;
 		if (ceiling) {
 			piece = wide == 3 ? ceiling3wide : (wide == 2 ? ceiling2wide : ceiling1wide);
-			float topY = Camera.main.ScreenToWorldPoint(new Vector3(0, Camera.main.pixelHeight, 0)).y;
-			spawnPos.y = topY - (grid.cellSizeY / 2.0f) + 0.2f;
+
+			if (y == 7) {
+				float topY = Camera.main.ScreenToWorldPoint(new Vector3(0, Camera.main.pixelHeight, 0)).y;
+				spawnPos.y = topY - (grid.cellSizeY / 2.0f) + 0.2f;
+			}
 		} else {
 			piece = wide == 3 ? ground3wide : (wide == 2 ? ground2wide : ground1wide);
 		}

@@ -69,6 +69,8 @@ public class Movement : MonoBehaviour {
 			target = endPoint.transform.position;
 			moveUpdate();
 		}
+
+		UpdateForceOverTime ();
 	}
 
 	private void moveUpdate () {
@@ -133,11 +135,41 @@ public class Movement : MonoBehaviour {
 			direction *= -1;
 			moveTicker = 0;
 		}
-
 	}
 
 	void OnCollisionEnter(Collision collision) {
 		direction *= -1;
 		moveTicker = 0;
+	}
+
+	private Vector3 flickStart;
+	private Vector3 flickEnd;
+	private Vector3 flickDirection;
+	private Vector3 flickVelocity;
+	private float flickSpeed = 2.0f;
+	private float flickTimer;
+
+	void OnMouseDown() {
+		// Register Start
+		flickStart = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+	}
+
+	void OnMouseExit() {
+		// Register End
+		flickEnd = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+		flickDirection = flickEnd - flickStart;
+		flickDirection.Normalize ();
+		flickTimer = 10.0f;
+	}
+
+	void UpdateForceOverTime() {
+		if (flickTimer <= 0.0f) {
+			return;
+		}
+
+		Debug.Log ("Force is happening");
+
+		flickTimer -= Time.deltaTime;
+		transform.position += flickDirection * flickSpeed * Time.deltaTime;
 	}
 }

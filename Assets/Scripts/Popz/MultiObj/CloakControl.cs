@@ -33,6 +33,7 @@ public class CloakControl : MonoBehaviour {
 		}
 
 		timedReveal (3.5f);
+
 	}
 	
 	// Update is called once per frame
@@ -71,23 +72,23 @@ public class CloakControl : MonoBehaviour {
 	}
 
 	void OnMouseDown () {
-		// Verify in radius
-		var selectionRadius = player.GetComponentInChildren<SphereCollider> ();
-		var radius = selectionRadius.gameObject.transform.localScale.x / 2.0f;
-
-		var object2D = new Vector2 (transform.position.x, transform.position.y);
-		var player2D = new Vector2 (selectionRadius.transform.position.x,
-		                            selectionRadius.transform.position.y);
-
-		//var dist = transform.position - selectionRadius.gameObject.transform.position;
-		var dist = object2D - player2D;
-		Debug.Log ("Radius: " + radius);
-		Debug.Log ("Distance: " + dist.magnitude);
-
-		if (dist.magnitude > radius) {
-			Debug.Log("Not in selection radius");
-			return;
-		}
+//		// Verify in radius
+//		var selectionRadius = player.GetComponentInChildren<SphereCollider> ();
+//		var radius = selectionRadius.gameObject.transform.localScale.x / 2.0f;
+//
+//		var object2D = new Vector2 (transform.position.x, transform.position.y);
+//		var player2D = new Vector2 (selectionRadius.transform.position.x,
+//		                            selectionRadius.transform.position.y);
+//
+//		//var dist = transform.position - selectionRadius.gameObject.transform.position;
+//		var dist = object2D - player2D;
+//		Debug.Log ("Radius: " + radius);
+//		Debug.Log ("Distance: " + dist.magnitude);
+//
+//		if (dist.magnitude > radius) {
+//			Debug.Log("Not in selection radius");
+//			return;
+//		}
 	}
 
 	public void validate () {

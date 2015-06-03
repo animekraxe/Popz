@@ -29,7 +29,6 @@ public class NbackGenerator : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
 	}
 
 	// Entry for prototype platforms generation
@@ -78,10 +77,11 @@ public class NbackGenerator : MonoBehaviour {
 		for ( ; x < grid.numCellsX; x += rate) {
 			int rand = Random.Range(0, 2);
 			int y = rand == 0 ? 1 : 6;
+			//int y = 1;
 			Transform h = GenerateNbackObjectInGrid(x, y, grid, tc);
 		}
 
-		ggen.GenerateGrounds (grid, tc, 0, false);
+		ggen.GenerateGrounds (grid, tc, 0, false, 60);
 		ggen.GenerateGrounds (grid, tc, 7, true);
 
 		lastGridOffset = x - grid.numCellsX;
