@@ -3,10 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class MultiObjGameManager : MonoBehaviour {
-	
+	/*
+	public int level;
+	private float result = 0f;
+	private string colorCreature = "";
+
+	public GameObject creaturePrefab;
+	public GameObject field;
+
+	//Game State Variables
+	public float pushSpeed = 6.5f;
+
+	void Start() {
+		for (int i = 0; i < level+4; i++) {
+			result = Random.Range (1, 3);
+			print (result);			//test
+			Instantiate(creaturePrefab);
+		}
+	}
+}
+	*/
 	public int level;
 	public int stage;
-	public int numDistractors;
+	//public int numDistractors;
 
 	public GameObject field;
 	public GameObject creaturePrefab;
@@ -31,11 +50,12 @@ public class MultiObjGameManager : MonoBehaviour {
 
 	void startCreatures () {
 		FieldInfo info = Util.getFieldInfo(field);
-		for (int i = 0; i < level + numDistractors; ++i) {
+		for (int i = 0; i < level ; ++i) {
 			// Universal parameters for all creatures
-			var spawnPosition = new Vector3(Random.Range (info.lowerX, info.upperX - (info.width / 2.0f)),
-			                                Random.Range (info.lowerY + 2, info.upperY),
+			var spawnPosition = new Vector3(Random.Range (info.lowerX + 1, info.upperX + 7),
+			                                Random.Range (info.lowerY + 5, info.upperY - 1),
 			                                0);
+
 			var creature = Instantiate(creaturePrefab) as GameObject;
 			creature.transform.position = spawnPosition;
 			creature.GetComponent<Movement>().field = field;
@@ -51,10 +71,11 @@ public class MultiObjGameManager : MonoBehaviour {
 		}
 	}
 
+/*
 	void startPlayer () {
 		player.GetComponentInChildren<MultiObjPlayer> ().setCollectors (colorSet);
 	}
-
+*/
 	public void startLevel () {
 		if (stage > level) {
 			++level;
@@ -66,7 +87,7 @@ public class MultiObjGameManager : MonoBehaviour {
 		}
 
 		colorSet = Util.genColorSet (stage);
-		startPlayer ();
+//		startPlayer ();
 		startCreatures ();
 		gameRunning = true;
 	}

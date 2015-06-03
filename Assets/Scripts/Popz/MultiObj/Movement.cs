@@ -17,9 +17,9 @@ public class Movement : MonoBehaviour {
 	public Vector3 target;
 	public float pushSpeed = 0.0f;
 
-	private float speed = 3.0f;
+	private float speed = 2.0f;
 	private float moveTicker;
-	private float moveWaitTime = 2f;
+	private float moveWaitTime = 3f;
 	private int direction;
 
 	// Animation Flag
@@ -44,7 +44,7 @@ public class Movement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		var bottomLeftCorner = Camera.main.ViewportToWorldPoint (new Vector3 (0, 0, 0));
-		var upperRightCorner = Camera.main.ViewportToWorldPoint (new Vector3 (0.5f, 1, 0));
+		var upperRightCorner = Camera.main.ViewportToWorldPoint (new Vector3 (1f, 1f, 0));
 
 		topBound.transform.position = upperRightCorner;
 		bottomBound.transform.position = bottomLeftCorner;
@@ -78,6 +78,10 @@ public class Movement : MonoBehaviour {
 			return;
 		}
 
+//		if (GetComponent<ManualMove> ().isSwiped) {
+//			Debug.Log ("swiped!");
+//			target = GetComponent<ManualMove> ().endMousePos;
+//		}
 		float step = speed * Time.deltaTime;
 		transform.Translate(Vector3.forward * step);
 		Vector3 targetDir = target - transform.position;
@@ -94,11 +98,21 @@ public class Movement : MonoBehaviour {
 			float xMax = rightBound.transform.position.x;
 			float yMax = topBound.transform.position.y;
 			float yMin = bottomBound.transform.position.y;
-			
-			Vector3 newTarget = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), 0);
-			target = newTarget;
-			moveTicker = 0;
-			direction = 1;
+
+			if(GetComponent<ManualMove>().isSwiped){
+				Vector3 newtarget = GetComponent<ManualMove> ().endMousePos;
+				target = newtarget;
+				moveTicker = 0;
+				direction = 1;
+			}
+			else{
+				Vector3 newTarget = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), 0);
+				//Vector3 newTarget = new Vector3(0, 0, 0);
+
+				target = newTarget;
+				moveTicker = 0;
+				direction = 1;
+			}
 		}
 	}
 
@@ -135,40 +149,36 @@ public class Movement : MonoBehaviour {
 			direction *= -1;
 			moveTicker = 0;
 		}
+
 	}
 
-	void OnCollisionEnter(Collision collision) {
+	void OnCollisionEnter(Collision other) {
 		direction *= -1;
 		moveTicker = 0;
 	}
-
+	//
 	private Vector3 flickStart;
 	private Vector3 flickEnd;
 	private Vector3 flickDirection;
-	private Vector3 flickVelocity;
 	private float flickSpeed = 2.0f;
 	private float flickTimer;
-
+	
 	void OnMouseDown() {
-		// Register Start
 		flickStart = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 	}
-
+	
 	void OnMouseExit() {
-		// Register End
 		flickEnd = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		flickDirection = flickEnd - flickStart;
 		flickDirection.Normalize ();
 		flickTimer = 10.0f;
 	}
-
+	
 	void UpdateForceOverTime() {
 		if (flickTimer <= 0.0f) {
 			return;
 		}
-
-		Debug.Log ("Force is happening");
-
+		
 		flickTimer -= Time.deltaTime;
 		transform.position += flickDirection * flickSpeed * Time.deltaTime;
 	}

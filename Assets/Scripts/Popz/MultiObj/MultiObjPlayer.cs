@@ -5,7 +5,7 @@ using System.Linq;
 
 public class MultiObjPlayer : MonoBehaviour {
 
-	public GameObject collector;
+	//public GameObject collector;
 
 	// TODO: MOVE SCORING TO GAME MANAGER NOT PLAYER
 	private int score;
@@ -14,6 +14,7 @@ public class MultiObjPlayer : MonoBehaviour {
 	// For Input States
 	Vector2 initTouchPos;
 
+	/*
 	// Player has this collector - Bool or Int? Can have multiple?
 	// TODO: DECIDE IF BIN SYSTEM OR JUST USE COLORS
 	private Bin rBin = new Bin();
@@ -24,26 +25,27 @@ public class MultiObjPlayer : MonoBehaviour {
 
 	// Collection Bins State
 	private List<Bin> collectionBins = new List<Bin> ();
-
+	*/
 	// Use this for initialization
 	void Start () {
 		score = 0;
 		//AddToScore (0);
-
+/*
 		rBin.construct (Color.red);
 		bBin.construct (Color.blue);
 		gBin.construct (Color.green);
 		mBin.construct (Color.magenta);
 		yBin.construct (Color.yellow);
+		*/
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		updateBinSwitch ();
-		updateCollector ();
-		HandleInput ();
+//		updateBinSwitch ();
+//		updateCollector ();
+//		HandleInput ();
 	}
-
+	/*
 	public void regenCollectors (int num) {
 		List<Bin> bins = new List<Bin> ();
 		bins.Add (rBin);
@@ -91,7 +93,7 @@ public class MultiObjPlayer : MonoBehaviour {
 	public Color currentColor () {
 		return collectionBins[0].color;
 	}
-
+*/
 	public void AddToScore (int num, bool isCloakedObj) {
 		score += num;
 		Debug.Log ("Score: " + score);
@@ -108,7 +110,7 @@ public class MultiObjPlayer : MonoBehaviour {
 	public int GetScore () {
 		return score;
 	}
-
+	/*
 	void HandleInput() {
 		if (Input.GetKeyDown(KeyCode.RightShift)) {
 			Selection.DoSelection();
@@ -135,5 +137,5 @@ public class MultiObjPlayer : MonoBehaviour {
 
 	void OnSwipeDown () {
 		Selection.DoSelection();
-	}
+	}*/
 }

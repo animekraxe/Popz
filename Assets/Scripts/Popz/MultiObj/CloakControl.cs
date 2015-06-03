@@ -2,6 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum BugType {
+	Red,
+	Green,
+	Blue,
+	Yellow,
+	White,
+};
+
 public class CloakControl : MonoBehaviour {
 
 	// Reference to Player
@@ -15,6 +23,7 @@ public class CloakControl : MonoBehaviour {
 	private Material initMaterial;
 	private Material revealMaterial;
 	private float revealTicker;
+	public BugType type;
 
 	private List<Color> colorSet;
 	public AudioClip success;
@@ -33,7 +42,6 @@ public class CloakControl : MonoBehaviour {
 		}
 
 		timedReveal (3.5f);
-
 	}
 	
 	// Update is called once per frame
@@ -67,6 +75,10 @@ public class CloakControl : MonoBehaviour {
 		colorSet = cset;
 	}
 
+	public Color getRevealColor () {
+		return revealMaterial.color;
+	}
+
 	public bool isDistractor() {
 		return is_distractor;
 	}
@@ -90,7 +102,7 @@ public class CloakControl : MonoBehaviour {
 //			return;
 //		}
 	}
-
+/*
 	public void validate () {
 		//TODO: MOVE SCORING AND VERIFICATION TO GAME MANAGER OR NEW SCRIPT
 		var is_correct = player.currentColor () == revealMaterial.color;
@@ -102,4 +114,5 @@ public class CloakControl : MonoBehaviour {
 			AudioSource.PlayClipAtPoint(fail, this.transform.position);
 		}
 	}
+	*/
 }
