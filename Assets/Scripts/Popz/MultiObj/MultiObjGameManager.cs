@@ -3,39 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class MultiObjGameManager : MonoBehaviour {
-	/*
-	public int level;
-	private float result = 0f;
-	private string colorCreature = "";
 
-	public GameObject creaturePrefab;
-	public GameObject field;
-
-	//Game State Variables
-	public float pushSpeed = 6.5f;
-
-	void Start() {
-		for (int i = 0; i < level+4; i++) {
-			result = Random.Range (1, 3);
-			print (result);			//test
-			Instantiate(creaturePrefab);
-		}
-	}
-}
-	*/
 	public int level;
 	public int stage;
-	//public int numDistractors;
+	public float pushSpeed = 6.0f;
 
 	public GameObject field;
-	public GameObject creaturePrefab;
 	public GameObject player;
-
-	private List<Color> colorSet;
+	public List<Transform> trackingObjects;
 
 	// Game State Variables
 	private bool gameRunning = false;
-	public float pushSpeed = 6.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -56,26 +34,13 @@ public class MultiObjGameManager : MonoBehaviour {
 			                                Random.Range (info.lowerY + 5, info.upperY - 1),
 			                                0);
 
-			var creature = Instantiate(creaturePrefab) as GameObject;
-			creature.transform.position = spawnPosition;
-			creature.GetComponent<Movement>().field = field;
-			creature.GetComponent<Movement>().pushSpeed = pushSpeed;
-			creature.GetComponent<CloakControl>().player = player.GetComponentInChildren<MultiObjPlayer>();
-			creature.GetComponent<CloakControl>().setColorSet(colorSet);
-			creature.GetComponent<Selection>().player = player.GetComponentInChildren<MultiObjPlayer>();
-
-			// Distractor parameters only
-			if (i >= level) {
-				creature.GetComponent<CloakControl>().is_distractor = true;
-			}
+			int rand = Random.Range (0, trackingObjects.Count);
+			Transform creature = Instantiate (trackingObjects[rand], spawnPosition, Quaternion.identity) as Transform;
+			creature.gameObject.GetComponent<Movement>().field = field;
+			creature.gameObject.GetComponent<Movement>().pushSpeed = pushSpeed;
 		}
 	}
-
-/*
-	void startPlayer () {
-		player.GetComponentInChildren<MultiObjPlayer> ().setCollectors (colorSet);
-	}
-*/
+	
 	public void startLevel () {
 		if (stage > level) {
 			++level;
@@ -86,8 +51,6 @@ public class MultiObjGameManager : MonoBehaviour {
 			stage = 1;
 		}
 
-		colorSet = Util.genColorSet (stage);
-//		startPlayer ();
 		startCreatures ();
 		gameRunning = true;
 	}

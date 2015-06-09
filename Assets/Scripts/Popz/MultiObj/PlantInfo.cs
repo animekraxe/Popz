@@ -12,6 +12,8 @@ public class PlantInfo : MonoBehaviour {
 	public Slider healthSlider;
 //	public bool alive = true;
 
+	public BugType correctBugType;
+
 	// Use this for initialization
 	void Start () {
 //		var bugColor = GameObject.FindGameObjectWithTag ("Bug");
@@ -22,7 +24,7 @@ public class PlantInfo : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Debug.Log (health);
+		//Debug.Log (health);
 		healthSlider.value = health;
 
 	}
@@ -41,7 +43,7 @@ public class PlantInfo : MonoBehaviour {
 //		Debug.Log ("Entered trigger");
 		if (other.collider.tag == "Bug") {
 			var otherBug = other.collider.gameObject;
-			if (otherBug.GetComponent<CloakControl>().getRevealColor() == this.GetComponent<Renderer>().material.color){
+			if (otherBug.GetComponent<CloakControl>().type == correctBugType){
 //				Physics.IgnoreCollision( other.collider, this.collider);
 //				this.depleteBy = -8;
 				this.health += 25;

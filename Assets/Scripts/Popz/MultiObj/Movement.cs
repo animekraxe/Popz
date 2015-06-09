@@ -22,7 +22,8 @@ public class Movement : MonoBehaviour {
 	private float moveWaitTime = 3f;
 	private int direction;
 
-	// Animation Flag
+	// Animations
+	public Transform touchSprite;
 	private bool endAnimationPlay;
 
 	// Use this for initialization
@@ -82,14 +83,21 @@ public class Movement : MonoBehaviour {
 //			Debug.Log ("swiped!");
 //			target = GetComponent<ManualMove> ().endMousePos;
 //		}
+
 		float step = speed * Time.deltaTime;
-		transform.Translate(Vector3.forward * step);
+//		transform.Translate(Vector3.forward * step);
+//		Vector3 targetDir = target - transform.position;
+//		targetDir.x *= direction;
+//		targetDir.y *= direction;
+//		Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0f);
+//		Debug.DrawRay(transform.position, newDir, Color.red);
+//		transform.rotation = Quaternion.LookRotation(newDir);
+
 		Vector3 targetDir = target - transform.position;
+		targetDir.Normalize ();
 		targetDir.x *= direction;
 		targetDir.y *= direction;
-		Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0f);
-		Debug.DrawRay(transform.position, newDir, Color.red);
-		transform.rotation = Quaternion.LookRotation(newDir);
+		transform.Translate (targetDir * step);
 	}
 
 	private void changeTarget () {
@@ -134,14 +142,17 @@ public class Movement : MonoBehaviour {
 		*/
 
 		// Turn around before you hit the walls
-		if (transform.position.x < xMin + 1 || transform.position.x > xMax - 1
-		    || transform.position.y < yMin + 2 || transform.position.y > yMax - 1) {
+		if (transform.position.x < xMin + 0.5f || transform.position.x > xMax - 0.5f
+		    || transform.position.y < yMin + 2.5f || transform.position.y > yMax - 0.5f) {
 			//transform.position = new Vector3(xMin + 1, yMax - 1, 0);
+
+			Debug.Log ("Hit Bounds");
+
 			moveTicker = moveWaitTime;
-			changeTarget();
-			transform.LookAt(target);
-			//direction *= -1;
-			//moveTicker = 0;
+			//changeTarget();
+
+			direction *= -1;
+			moveTicker = 0;
 		}
 
 		else if (transform.position.y > yMax) {
@@ -156,18 +167,33 @@ public class Movement : MonoBehaviour {
 		direction *= -1;
 		moveTicker = 0;
 	}
-	//
+
 	private Vector3 flickStart;
 	private Vector3 flickEnd;
 	private Vector3 flickDirection;
-	private float flickSpeed = 2.0f;
+	private float flickSpeed = 3.5f;
 	private float flickTimer;
-	
+
+	// For touch sprite animations
+	private Transform currTouchSprite;
+
 	void OnMouseDown() {
+		currTouchSprite = Instantiate (touchSprite, transform.position, Quaternion.identity) as Transform;
+
 		flickStart = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+	}
+
+	void OnMouseDrag () {
+		if (currTouchSprite) {
+			currTouchSprite.position = transform.position;
+		}
 	}
 	
 	void OnMouseExit() {
+		if (currTouchSprite) {
+			Destroy (currTouchSprite.gameObject);
+		}
+
 		flickEnd = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		flickDirection = flickEnd - flickStart;
 		flickDirection.Normalize ();
